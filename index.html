@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traxvo — Marketing Intelligence, Engineered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
+<style>
+  :root{
+    --ground:#f3f2f2; --surface:#eae9e9; --ink:#201e1d; --dark:#141211; --light:#f8f4f4;
+    --accent:#ec3013; --accent-700:#b3210a; --accent-deep:#ae1800;
+    --muted:rgba(32,30,29,.64); --faint:rgba(32,30,29,.44);
+    --line:rgba(32,30,29,.14); --muted-d:#9b9797; --line-d:rgba(248,244,244,.15);
+    --sans:'Archivo','Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-font-smoothing:antialiased}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.5;overflow-x:hidden;font-weight:400}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+  ::selection{background:var(--accent);color:var(--light)}
+  @media(max-width:700px){.wrap{padding:0 22px}}
+
+  .kicker{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-700)}
+  .kicker.on-dark{color:var(--accent)}
+  h1,h2,h3,h4{font-weight:800;letter-spacing:-.03em;line-height:.98}
+  .asq{display:inline-block;background:var(--accent);vertical-align:baseline}
+
+  /* THE MARK — CSS target-lock, exact brand geometry (84px canonical) */
+  .markwrap{position:relative;flex:none;width:calc(84px*var(--s,1));height:calc(84px*var(--s,1))}
+  .mark{position:relative;width:84px;height:84px;background:var(--m-o,var(--ink));transform:scale(var(--s,1));transform-origin:top left}
+  .mark i{position:absolute;display:block}
+  .mark .a{left:12px;top:12px;width:60px;height:60px;background:var(--m-a,var(--light))}
+  .mark .b{left:22px;top:22px;width:40px;height:40px;background:var(--m-b,var(--ink))}
+  .mark .c{left:32px;top:32px;width:20px;height:20px;background:var(--m-c,var(--accent))}
+  .mark .d{left:71px;top:-5px;width:14px;height:14px;background:var(--m-d,var(--accent))}
+  .mark.rev{--m-o:var(--accent);--m-a:var(--dark);--m-b:var(--accent);--m-c:var(--light);--m-d:var(--light)}
+  .mark.anim .d{animation:breakout 3.4s cubic-bezier(.6,0,.2,1) infinite}
+  .mark.anim .c{animation:pulse 3.4s ease-in-out infinite}
+  @keyframes breakout{0%,55%,100%{transform:translate(0,0)}72%{transform:translate(11px,-11px)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  @media(prefers-reduced-motion:reduce){.mark.anim .d,.mark.anim .c{animation:none}}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;gap:11px;font-weight:700;font-size:14px;letter-spacing:-.01em;padding:15px 26px;border-radius:2px;transition:.22s;cursor:pointer;border:1px solid transparent}
+  .btn-primary{background:var(--accent);color:var(--light)}
+  .btn-primary:hover{background:var(--accent-deep);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--ink)}
+  .btn .arw{transition:.25s}.btn:hover .arw{transform:translateX(4px)}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(26px);transition:opacity .95s cubic-bezier(.16,.84,.44,1),transform .95s cubic-bezier(.16,.84,.44,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.rv{opacity:1!important;transform:none!important;transition:none}.marquee-track,.blob{animation:none!important}}
+
+  /* NAV */
+  header{position:fixed;top:0;left:0;right:0;z-index:40;transition:.3s;padding:20px 0;border-bottom:1px solid transparent}
+  header.scrolled{background:rgba(243,242,242,.85);backdrop-filter:blur(14px);border-bottom-color:var(--line);padding:13px 0}
+  .nav{display:flex;align-items:center;justify-content:space-between}
+  .nav-brand{display:flex;align-items:center;gap:12px}
+  .wordmark{font-weight:800;font-size:22px;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:6px}
+  .nav-mid{display:flex;gap:34px}
+  .nav-mid a{font-size:14px;font-weight:500;color:var(--muted);transition:.2s}
+  .nav-mid a:hover{color:var(--ink)}
+  @media(max-width:820px){.nav-mid{display:none}}
+
+  /* HERO */
+  .hero{position:relative;padding:170px 0 90px;overflow:hidden}
+  .hero .cgrid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(ellipse 70% 80% at 78% 40%,#000,transparent 72%);opacity:.6}
+  .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.25fr .75fr;gap:56px;align-items:center}
+  .hero .eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+  .hero .eyebrow .rule{height:2px;width:40px;background:var(--accent)}
+  .hero h1{font-size:clamp(46px,7.4vw,104px)}
+  .hero h1 .red{color:var(--accent)}
+  .hero p.sub{color:var(--muted);font-size:19px;max-width:44ch;margin:32px 0 36px;line-height:1.5}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-mark{display:flex;justify-content:center;align-items:center}
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:20px}.hero-mark{justify-content:flex-start;margin-top:20px}}
+
+  /* MARQUEE */
+  .marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;overflow:hidden;white-space:nowrap}
+  .marquee-track{display:inline-flex;animation:scrollx 30s linear infinite;will-change:transform}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  .marquee-track span{font-size:16px;font-weight:800;letter-spacing:-.01em;text-transform:uppercase;padding:0 26px;display:inline-flex;align-items:center;gap:26px}
+  .marquee-track span::after{content:"";width:7px;height:7px;background:var(--accent);flex:none}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
+
+  /* CLIENTS */
+  .clients{padding:66px 0}
+  .client-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+  .client{background:#fff;padding:30px 22px;display:flex;align-items:center;justify-content:center;transition:.3s;min-height:128px}
+  .client:hover{background:var(--surface)}
+  .clogo{max-height:54px;max-width:78%;width:auto;object-fit:contain;filter:grayscale(35%);opacity:.88;transition:.3s}
+  .client:hover .clogo{filter:none;opacity:1;transform:scale(1.03)}
+  .clogo.tall{max-height:82px}
+  .clogo.sq{max-height:64px;border-radius:10px}
+  .client .ctext{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--muted);transition:.3s;white-space:nowrap}
+  .client:hover .ctext{color:var(--ink)}
+  @media(max-width:820px){.client-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:440px){.client-grid{grid-template-columns:1fr}}
+
+  section.pad{padding:120px 0;position:relative}
+  .sec-top{margin-bottom:52px}
+  h2.big{font-size:clamp(30px,4.6vw,56px)}
+  .sec-intro{color:var(--muted);font-size:19px;max-width:52ch;margin-top:20px;line-height:1.5}
+
+  /* PROBLEM — dark poster */
+  .poster{background:var(--dark);color:var(--light);position:relative;overflow:hidden}
+  .poster .blob{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,var(--accent),transparent 62%);filter:blur(120px);opacity:.32;top:-160px;right:-120px;animation:drift 24s ease-in-out infinite}
+  @keyframes drift{50%{transform:translate(-50px,60px)}}
+  .poster .stmt{font-size:clamp(28px,4.4vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.06;max-width:20ch;position:relative;z-index:2}
+  .poster .stmt .red{color:var(--accent)}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:70px;background:var(--line-d);position:relative;z-index:2}
+  .stat{background:var(--dark);padding:36px 30px 8px 0}
+  .stat .n{font-size:clamp(44px,6.5vw,80px);font-weight:800;letter-spacing:-.04em;line-height:1}
+  .stat .l{color:var(--muted-d);font-size:15px;margin-top:14px;max-width:24ch}
+  @media(max-width:760px){.stat-row{grid-template-columns:1fr;gap:1px}.stat{padding:26px 0 20px}}
+
+  /* WORK / demos */
+  .cases{border-top:1px solid var(--ink)}
+  .case{display:grid;grid-template-columns:60px 1.5fr 1fr auto;gap:28px;align-items:center;padding:34px 0;border-bottom:1px solid var(--line);transition:.35s;position:relative}
+  .case::before{content:"";position:absolute;left:-40px;right:-40px;top:0;bottom:0;background:var(--ink);opacity:0;transition:.35s;z-index:0}
+  .case>*{position:relative;z-index:1;transition:.35s}
+  .case:hover::before{opacity:1}
+  .case:hover .idx{color:var(--accent)}
+  .case:hover .name,.case:hover .desc,.case:hover .visit{color:var(--light)}
+  .case:hover .tags span{border-color:var(--line-d);color:var(--muted-d)}
+  .case .idx{font-size:14px;font-weight:800;color:var(--accent-700)}
+  .case .name{font-size:clamp(24px,3.1vw,38px);font-weight:800;letter-spacing:-.03em}
+  .case .tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+  .case .tags span{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:5px 10px;border-radius:2px;color:var(--faint)}
+  .case .desc{color:var(--muted);font-size:15.5px;line-height:1.45}
+  .case .visit{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:12px;white-space:nowrap}
+  .case .visit .arw{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;transition:.3s;font-size:15px}
+  .case:hover .visit .arw{background:var(--accent);color:var(--light);border-color:var(--accent);transform:rotate(-45deg)}
+  @media(max-width:860px){.case{grid-template-columns:34px 1fr;gap:6px 14px}.case .desc,.case .visit{grid-column:2}}
+
+  /* SERVICES grid */
+  .svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+  .svc{background:var(--ground);padding:44px 38px;transition:.3s}
+  .svc:hover{background:var(--surface)}
+  .svc .num{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:22px;letter-spacing:.04em}
+  .svc h3{font-size:25px;margin-bottom:12px;letter-spacing:-.02em}
+  .svc p{color:var(--muted);font-size:15.5px;max-width:40ch;line-height:1.5}
+  @media(max-width:760px){.svc-grid{grid-template-columns:1fr}.svc{padding:34px 26px}}
+
+  /* APPROACH */
+  .appr{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;align-items:start}
+  .appr-item{padding:28px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:52px 1fr;gap:20px;align-items:baseline}
+  .appr-item:last-child{border-bottom:1px solid var(--line)}
+  .appr-item .k{font-size:14px;font-weight:800;color:var(--accent)}
+  .appr-item h4{font-size:20px;margin-bottom:6px;letter-spacing:-.02em}
+  .appr-item p{color:var(--muted);font-size:15.5px;line-height:1.5}
+  @media(max-width:860px){.appr{grid-template-columns:1fr;gap:32px}}
+
+  /* CTA — dark poster */
+  .cta .cta-inner{background:var(--dark);color:var(--light);border-radius:3px;padding:72px 56px;position:relative;overflow:hidden}
+  .cta .glow{position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,var(--accent),transparent 60%);filter:blur(130px);opacity:.26;top:-220px;left:52%;transform:translateX(-50%)}
+  .cta-grid{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+  .cta-grid h2{font-size:clamp(32px,4.4vw,54px)}
+  .cta-grid h2 .red{color:var(--accent)}
+  .cta-grid .lead{color:var(--muted-d);font-size:18px;margin-top:22px;max-width:38ch;line-height:1.5}
+  .form{display:grid;gap:12px}
+  .form input,.form textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:2px;padding:16px 18px;color:var(--light);font-size:15px;font-family:inherit;outline:none;transition:.22s}
+  .form input::placeholder,.form textarea::placeholder{color:var(--muted-d)}
+  .form input:focus,.form textarea:focus{border-color:var(--accent)}
+  .form button{width:100%;justify-content:center;border:none;margin-top:4px}
+  .form-note{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-d);margin-top:16px}
+  .ok{display:none;border:1px solid var(--accent);border-radius:3px;padding:22px;color:var(--light);font-size:17px;font-weight:500}
+  .ok b{color:var(--accent)}
+  @media(max-width:860px){.cta-grid{grid-template-columns:1fr;gap:32px}.cta .cta-inner{padding:44px 26px}}
+
+  /* FOOTER — dark */
+  footer{background:var(--dark);color:var(--light);padding:80px 0 40px;margin-top:80px}
+  .foot-top{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end}
+  .foot-word{font-size:clamp(64px,15vw,190px);font-weight:800;letter-spacing:-.05em;line-height:.8;display:flex;align-items:baseline;gap:14px}
+  .foot-right{text-align:right}
+  .foot-tag{color:var(--muted-d);font-size:14px;margin-bottom:16px}
+  .foot-mail{font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .foot-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:64px;padding-top:26px;border-top:1px solid var(--line-d);font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--muted-d);text-transform:uppercase}
+  .foot-meta .av{color:var(--accent)}
+  @media(max-width:760px){.foot-top{grid-template-columns:1fr}.foot-right{text-align:left}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header id="hd">
+  <div class="wrap nav">
+    <div class="nav-brand">
+      <div class="markwrap" style="--s:.36"><div class="mark"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div></div>
+      <span class="wordmark">TRAXVO<span class="asq" style="width:6px;height:6px"></span></span>
+    </div>
+    <nav class="nav-mid">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#approach">Approach</a>
+      <a href="#book">Contact</a>
+    </nav>
+    <a href="#book" class="btn btn-primary" style="padding:12px 20px">Book a free audit <span class="arw">→</span></a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="cgrid"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow rv"><span class="rule"></span><span class="kicker">Marketing Intelligence, Engineered</span></div>
+      <h1 class="rv">Lock on to<br>every lead.<br><span class="red">Break through.</span></h1>
+      <p class="sub rv">Traxvo builds the websites, AI assistants, automations and content that capture and book your customers around the clock — so local businesses stop losing leads to whoever replies first.</p>
+      <div class="hero-cta rv">
+        <a href="#book" class="btn btn-primary">Book a free audit <span class="arw">→</span></a>
+        <a href="#work" class="btn btn-ghost">See live demos</a>
+      </div>
+    </div>
+    <div class="hero-mark rv">
+      <div class="markwrap" style="--s:2.5"><div class="mark anim"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>AI websites</span><span>AI chat assistants</span><span>Automation</span><span>AI content creation</span><span>Track · Vector · Outcome</span><span>Built for local business</span>
+    <span>AI websites</span><span>AI chat assistants</span><span>Automation</span><span>AI content creation</span><span>Track · Vector · Outcome</span><span>Built for local business</span>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<section class="pad clients">
+  <div class="wrap">
+    <div class="kicker rv" style="text-align:center;margin-bottom:34px">Trusted by businesses we've built for</div>
+    <div class="client-grid">
+      <div class="client rv"><img class="clogo" src="logos/mrcod.webp" alt="MR COD" loading="lazy"></div>
+      <div class="client rv"><img class="clogo tall" src="logos/vgliving.png" alt="VG Living" loading="lazy"></div>
+      <div class="client rv"><img class="clogo" src="logos/mentulis.png" alt="Mentulis" loading="lazy"></div>
+      <div class="client rv"><img class="clogo sq" src="logos/sip.png" alt="SIP Coffee" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="pad poster">
+  <div class="blob"></div>
+  <div class="wrap">
+    <div class="kicker on-dark rv" style="margin-bottom:36px">(01) — The position</div>
+    <p class="stmt rv">Most local businesses don't lose customers because they're bad. They lose them because <span class="red">nobody answered in time.</span></p>
+    <div class="stat-row">
+      <div class="stat rv"><div class="n">62%</div><div class="l">of calls to small businesses go unanswered</div></div>
+      <div class="stat rv"><div class="n">78%</div><div class="l">buy from whoever responds to them first</div></div>
+      <div class="stat rv"><div class="n">24/7</div><div class="l">is when leads arrive — not just business hours</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="pad" id="work">
+  <div class="wrap">
+    <div class="sec-top">
+      <div class="kicker rv" style="margin-bottom:20px">(02) — Selected work</div>
+      <h2 class="big rv">Don't take our word for it.<br><span style="color:var(--accent)">Play with a live one.</span></h2>
+      <p class="sec-intro rv">Real, working AI assistants we've built. Open one, ask it anything, and watch it capture a lead in real time.</p>
+    </div>
+    <div class="cases">
+      <a href="aquafix/" target="_blank" class="case rv">
+        <span class="idx">(01)</span>
+        <div>
+          <div class="name">AquaFix Plumbing</div>
+          <div class="tags"><span>Home Services</span><span>AI Chat</span><span>2026</span></div>
+        </div>
+        <div class="desc">An emergency-dispatch assistant that books jobs 24/7 and never lets a burst-pipe call go cold.</div>
+        <div class="visit">Visit site <span class="arw">→</span></div>
+      </a>
+      <a href="lumaglow/" target="_blank" class="case rv">
+        <span class="idx">(02)</span>
+        <div>
+          <div class="name">LumaGlow Med Spa</div>
+          <div class="tags"><span>Aesthetics</span><span>Booking Concierge</span><span>2026</span></div>
+        </div>
+        <div class="desc">A calm, on-brand concierge that turns late-night browsers into booked consultations.</div>
+        <div class="visit">Visit site <span class="arw">→</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="pad" id="services" style="background:var(--surface)">
+  <div class="wrap">
+    <div class="sec-top">
+      <div class="kicker rv" style="margin-bottom:20px">(03) — What we build</div>
+      <h2 class="big rv">Everything a local business<br>needs to win more customers.</h2>
+    </div>
+    <div class="svc-grid">
+      <div class="svc rv"><div class="num">01</div><h3>AI Websites</h3><p>Fast, modern, conversion-built websites that turn visitors into customers — designed, built, and launched in days, not months.</p></div>
+      <div class="svc rv"><div class="num">02</div><h3>AI Chat Assistants</h3><p>A 24/7 assistant on your site that answers questions, qualifies visitors, and books appointments automatically — like the live demos above.</p></div>
+      <div class="svc rv"><div class="num">03</div><h3>Automation</h3><p>Missed-call text-back, instant follow-ups, and booking workflows that make sure no lead ever slips through the cracks.</p></div>
+      <div class="svc rv"><div class="num">04</div><h3>AI Content Creation</h3><p>On-brand social posts, emails, and ad creative produced at scale — so your marketing never goes quiet and always sounds like you.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- APPROACH -->
+<section class="pad" id="approach">
+  <div class="wrap appr">
+    <div>
+      <div class="kicker rv" style="margin-bottom:22px">(04) — The approach</div>
+      <h2 class="big rv">Simple to you.<br>Serious underneath.</h2>
+      <p class="sec-intro rv">No jargon, no tech headaches on your end. We handle the hard part — you just watch the bookings arrive.</p>
+    </div>
+    <div>
+      <div class="appr-item rv"><span class="k">(A)</span><div><h4>Audit first</h4><p>We map exactly where leads reach you today, and where they're slipping away.</p></div></div>
+      <div class="appr-item rv"><span class="k">(B)</span><div><h4>Built for your business</h4><p>Your assistant speaks in your voice, knows your services, and matches your brand.</p></div></div>
+      <div class="appr-item rv"><span class="k">(C)</span><div><h4>Live in days</h4><p>Not months. We ship fast, test with you, and go live quickly.</p></div></div>
+      <div class="appr-item rv"><span class="k">(D)</span><div><h4>Growth partners</h4><p>We stay on to tune, improve, and grow the system as you do.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="pad cta" id="book">
+  <div class="wrap">
+    <div class="cta-inner rv">
+      <div class="glow"></div>
+      <div class="cta-grid">
+        <div>
+          <div class="kicker on-dark" style="margin-bottom:24px">(05) — Let's talk</div>
+          <h2>Book your free<br><span class="red">lead audit.</span></h2>
+          <p class="lead">A short, no-pressure call. We'll show you where you're losing leads and exactly how AI plugs the gap — free, whether you work with us or not.</p>
+        </div>
+        <div>
+          <form class="form" id="bookForm" novalidate>
+            <input type="hidden" name="access_key" id="f-key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
+            <input type="hidden" name="subject" value="New free-audit request — traxvo.com">
+            <input type="hidden" name="from_name" value="Traxvo website">
+            <input type="checkbox" name="botcheck" id="f-bot" tabindex="-1" style="display:none" aria-hidden="true">
+            <input id="f-name" name="name" type="text" placeholder="Your name" required>
+            <input id="f-biz" name="business" type="text" placeholder="Business name" required>
+            <input id="f-contact" name="contact" type="text" placeholder="Phone or email" required>
+            <textarea id="f-msg" name="message" rows="3" placeholder="What does your business do? (optional)"></textarea>
+            <button type="submit" class="btn btn-primary" id="f-submit">Request my free audit <span class="arw">→</span></button>
+          </form>
+          <div class="form-note">Replies within one business day · No spam, ever</div>
+          <div class="ok" id="okMsg">Thank you, <b id="okName">friend</b> — your request is in. We'll be in touch within one business day.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-word">TRAXVO<span class="asq" style="width:18px;height:18px"></span></div>
+      <div class="foot-right">
+        <div class="foot-tag">Marketing Intelligence, Engineered.</div>
+        <a href="mailto:hello@traxvo.com" class="foot-mail">hello@traxvo.com</a>
+      </div>
+    </div>
+    <div class="foot-meta">
+      <span>© 2026 Traxvo</span>
+      <span>Toronto, Canada · <span class="av">Available for new clients</span></span>
+      <span>Track · Vector · Outcome</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* nav scrolled state */
+const hd=document.getElementById('hd');
+addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>40),{passive:true});
+
+/* reveal with hard safety fallbacks */
+const revealAll=()=>document.querySelectorAll('.rv:not(.in)').forEach(el=>el.classList.add('in'));
+if('IntersectionObserver' in window){
+  const io=new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const sibs=[...e.target.parentElement.children].filter(c=>c.classList.contains('rv'));
+        const i=sibs.indexOf(e.target);
+        if(i>0)e.target.style.transitionDelay=(i*80)+'ms';
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.16,rootMargin:'0px 0px -7% 0px'});
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+  addEventListener('load',()=>setTimeout(revealAll,4200));
+}else{revealAll();}
+
+/* buttery smooth scroll — Lenis if available, native fallback */
+(function(){
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js';
+  s.onload=()=>{try{
+    const lenis=new Lenis({duration:1.05,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),smoothWheel:true});
+    function raf(t){lenis.raf(t);requestAnimationFrame(raf);}requestAnimationFrame(raf);
+    document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+      const el=document.querySelector(a.getAttribute('href'));if(el){e.preventDefault();lenis.scrollTo(el,{offset:-10});}
+    }));
+  }catch(e){document.documentElement.style.scrollBehavior='smooth';}};
+  s.onerror=()=>{document.documentElement.style.scrollBehavior='smooth';};
+  document.body.appendChild(s);
+})();
+
+/* booking form — validates, then delivers via Web3Forms if a key is set,
+   otherwise falls back to on-page confirmation so the form is never broken. */
+document.getElementById('bookForm').addEventListener('submit',async function(ev){
+  ev.preventDefault();
+  const g=id=>document.getElementById(id);
+  const name=g('f-name').value.trim(),biz=g('f-biz').value.trim(),contact=g('f-contact').value.trim();
+  let bad=false;
+  [['f-name',name],['f-biz',biz],['f-contact',contact]].forEach(([id,v])=>{g(id).style.borderColor=v?'':'#ec3013';if(!v)bad=true;});
+  if(bad)return;
+  const done=()=>{this.style.display='none';g('okName').textContent=name.split(' ')[0];g('okMsg').style.display='block';};
+  const key=g('f-key').value;
+  if(key && key.indexOf('PASTE_YOUR')===-1){
+    const btn=g('f-submit'); btn.textContent='Sending…'; btn.disabled=true;
+    try{
+      const res=await fetch('https://api.web3forms.com/submit',{
+        method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+        body:JSON.stringify(Object.fromEntries(new FormData(this)))
+      });
+      const out=await res.json();
+      if(out.success){done();}
+      else{btn.disabled=false;btn.innerHTML='Request my free audit <span class="arw">→</span>';alert('Something went wrong sending your request. Please email hello@traxvo.com.');}
+    }catch(e){btn.disabled=false;btn.innerHTML='Request my free audit <span class="arw">→</span>';alert('Network error. Please email hello@traxvo.com.');}
+  }else{ done(); }
+});
+</script>
+</body>
+</html>

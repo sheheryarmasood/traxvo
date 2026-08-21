@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaFix Plumbing — 24/7 Emergency Plumbers in Toronto</title>
+<style>
+  :root{
+    --blue:#0b5cff; --blue-dark:#0742b8; --ink:#0e1726; --slate:#5b6b82;
+    --bg:#f5f8ff; --white:#ffffff; --line:#e4ebf5; --green:#12a150; --amber:#f5a623;
+    --shadow:0 10px 30px rgba(14,23,38,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--white);line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+  .btn{display:inline-block;background:var(--blue);color:#fff;font-weight:700;padding:14px 26px;border-radius:10px;transition:.15s;border:none;cursor:pointer;font-size:16px}
+  .btn:hover{background:var(--blue-dark);transform:translateY(-1px)}
+  .btn-ghost{background:#fff;color:var(--blue);border:2px solid var(--blue)}
+  .btn-ghost:hover{background:var(--bg)}
+
+  /* top bar */
+  header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+  .logo .drop{width:34px;height:34px;background:var(--blue);border-radius:9px;display:grid;place-items:center;color:#fff;font-size:18px}
+  .nav-links{display:flex;gap:26px;font-weight:600;color:var(--slate)}
+  .nav-links a:hover{color:var(--blue)}
+  .call-btn{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--blue);font-size:17px}
+  @media(max-width:820px){.nav-links{display:none}}
+
+  /* hero */
+  .hero{background:linear-gradient(160deg,#eaf1ff 0%,#f5f8ff 60%,#fff 100%);padding:70px 0 80px}
+  .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:#e7fbef;color:var(--green);font-weight:700;font-size:14px;padding:6px 14px;border-radius:100px;margin-bottom:18px}
+  .hero h1{font-size:46px;line-height:1.1;letter-spacing:-1px;margin-bottom:16px}
+  .hero p.sub{font-size:19px;color:var(--slate);margin-bottom:28px;max-width:520px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+  .trust-row{display:flex;gap:22px;flex-wrap:wrap;color:var(--slate);font-weight:600;font-size:14px}
+  .trust-row span{display:flex;align-items:center;gap:7px}
+  .hero-card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px}
+  .hero-card h3{font-size:18px;margin-bottom:14px}
+  .price-line{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--line);color:var(--slate);font-weight:600}
+  .price-line b{color:var(--ink)}
+  .stars{color:var(--amber);letter-spacing:2px}
+  @media(max-width:820px){.hero-grid{grid-template-columns:1fr;gap:34px}.hero h1{font-size:34px}}
+
+  /* strip */
+  .strip{background:var(--ink);color:#cdd8ea;padding:16px 0;font-weight:600;text-align:center;font-size:15px}
+  .strip b{color:#fff}
+
+  /* services */
+  section.pad{padding:74px 0}
+  .eyebrow{color:var(--blue);font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:13px;text-align:center}
+  h2.sec{font-size:34px;text-align:center;margin:8px 0 10px;letter-spacing:-.5px}
+  p.lead{text-align:center;color:var(--slate);max-width:620px;margin:0 auto 44px;font-size:17px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px;transition:.15s}
+  .card:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+  .card .ic{width:50px;height:50px;background:#eaf1ff;border-radius:12px;display:grid;place-items:center;font-size:24px;margin-bottom:14px}
+  .card h3{font-size:19px;margin-bottom:7px}
+  .card p{color:var(--slate);font-size:15px}
+  @media(max-width:820px){.cards{grid-template-columns:1fr}}
+
+  /* why */
+  .why{background:var(--bg)}
+  .why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+  .stat b{display:block;font-size:38px;color:var(--blue);font-weight:800}
+  .stat span{color:var(--slate);font-weight:600}
+  @media(max-width:820px){.why-grid{grid-template-columns:repeat(2,1fr);gap:30px}}
+
+  /* reviews */
+  .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .rev{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+  .rev p{color:var(--ink);margin:12px 0}
+  .rev .who{color:var(--slate);font-weight:700;font-size:14px}
+  @media(max-width:820px){.rev-grid{grid-template-columns:1fr}}
+
+  /* cta band */
+  .band{background:linear-gradient(120deg,var(--blue),#3a7bff);color:#fff;border-radius:22px;padding:48px;text-align:center}
+  .band h2{font-size:32px;margin-bottom:10px}
+  .band p{opacity:.92;font-size:18px;margin-bottom:24px}
+  .band .btn{background:#fff;color:var(--blue)}
+  .band .btn:hover{background:#eaf1ff}
+
+  /* footer */
+  footer{background:var(--ink);color:#9fb0c9;padding:44px 0;font-size:15px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px}
+  .foot .logo{color:#fff}
+
+  /* ===== CHAT WIDGET ===== */
+  #chatBtn{position:fixed;bottom:24px;right:24px;z-index:60;background:var(--blue);color:#fff;border:none;border-radius:100px;padding:15px 22px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(11,92,255,.45);display:flex;align-items:center;gap:10px;transition:.15s}
+  #chatBtn:hover{background:var(--blue-dark);transform:translateY(-2px)}
+  #chatBtn .pulse{width:10px;height:10px;background:#39e07f;border-radius:50%;box-shadow:0 0 0 0 rgba(57,224,127,.7);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(57,224,127,.6)}70%{box-shadow:0 0 0 12px rgba(57,224,127,0)}100%{box-shadow:0 0 0 0 rgba(57,224,127,0)}}
+  #chatWin{position:fixed;bottom:24px;right:24px;z-index:61;width:380px;max-width:calc(100vw - 32px);height:560px;max-height:calc(100vh - 48px);background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(14,23,38,.28);display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line)}
+  #chatWin.open{display:flex;animation:rise .22s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .chat-head{background:var(--blue);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px}
+  .chat-head .av{width:42px;height:42px;background:#fff;border-radius:50%;display:grid;place-items:center;font-size:22px}
+  .chat-head .t b{font-size:16px}
+  .chat-head .t small{opacity:.85;display:flex;align-items:center;gap:6px}
+  .chat-head .dot{width:8px;height:8px;background:#39e07f;border-radius:50%}
+  .chat-head .x{margin-left:auto;background:transparent;border:none;color:#fff;font-size:22px;cursor:pointer;opacity:.8}
+  .chat-head .x:hover{opacity:1}
+  .chat-body{flex:1;overflow-y:auto;padding:18px;background:var(--bg);display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:82%;padding:11px 15px;border-radius:15px;font-size:15px;line-height:1.45}
+  .bot{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+  .me{background:var(--blue);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+  .typing{display:flex;gap:4px;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:15px;align-self:flex-start;width:fit-content}
+  .typing span{width:7px;height:7px;background:#a8b6cc;border-radius:50%;animation:blink 1.3s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  .quick{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 12px;background:var(--bg)}
+  .quick button{background:#fff;border:1px solid var(--blue);color:var(--blue);font-weight:600;font-size:13px;padding:8px 13px;border-radius:100px;cursor:pointer;transition:.12s}
+  .quick button:hover{background:var(--blue);color:#fff}
+  .chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:#fff}
+  .chat-input input{flex:1;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;outline:none}
+  .chat-input input:focus{border-color:var(--blue)}
+  .chat-input button{background:var(--blue);color:#fff;border:none;border-radius:10px;width:46px;font-size:18px;cursor:pointer}
+  .lead-card{background:#e7fbef;border:1px solid #b6ecc9;border-radius:12px;padding:14px;font-size:14px;color:#0e5a2e;align-self:stretch}
+  .lead-card b{display:block;margin-bottom:6px;color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="drop">💧</span> AquaFix<span style="color:var(--blue)">Plumbing</span></div>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#why">Why Us</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#book">Book Now</a>
+    </nav>
+    <a href="tel:+14165550199" class="call-btn">📞 (416) 555-0199</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="badge">● Available 24/7 — Same-Day Service</span>
+      <h1>Toronto's Fastest<br>Emergency Plumbers</h1>
+      <p class="sub">Burst pipe? Blocked drain? No hot water? Our licensed plumbers are at your door in under 60 minutes — day or night, guaranteed.</p>
+      <div class="hero-cta">
+        <a href="tel:+14165550199" class="btn">📞 Call Now — (416) 555-0199</a>
+        <button class="btn btn-ghost" onclick="openChat()">💬 Chat & Book Online</button>
+      </div>
+      <div class="trust-row">
+        <span>⭐ 4.9 / 5 (612 reviews)</span>
+        <span>✅ Licensed & Insured</span>
+        <span>💲 Upfront Flat Pricing</span>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>⚡ Typical Response Times</h3>
+      <div class="price-line"><span>Emergency call-out</span><b>Under 60 min</b></div>
+      <div class="price-line"><span>Drain unclogging from</span><b>$149</b></div>
+      <div class="price-line"><span>Water heater repair from</span><b>$189</b></div>
+      <div class="price-line" style="border:none"><span>Free estimate on installs</span><b>$0</b></div>
+      <button class="btn" style="width:100%;margin-top:16px" onclick="openChat()">Get an Instant Quote →</button>
+      <p style="text-align:center;margin-top:10px;color:var(--slate);font-size:13px">💬 Ask our AI assistant — replies in seconds</p>
+    </div>
+  </div>
+</section>
+
+<div class="strip">🚨 <b>Emergency?</b> We answer 24/7 — if we miss your call, our system <b>texts you back within 60 seconds.</b></div>
+
+<!-- ============ SERVICES ============ -->
+<section class="pad" id="services">
+  <div class="wrap">
+    <p class="eyebrow">What We Fix</p>
+    <h2 class="sec">Plumbing Services You Can Count On</h2>
+    <p class="lead">From a dripping tap to a full repipe — our licensed team handles it all, fast and done right the first time.</p>
+    <div class="cards">
+      <div class="card"><div class="ic">🚿</div><h3>Drain Cleaning</h3><p>Blocked sinks, toilets, and main lines cleared with camera inspection included.</p></div>
+      <div class="card"><div class="ic">🔥</div><h3>Water Heaters</h3><p>Repair or replace tank & tankless units — same-day hot water restored.</p></div>
+      <div class="card"><div class="ic">💦</div><h3>Leak Detection</h3><p>Hidden leaks found fast with no-damage tech before they wreck your home.</p></div>
+      <div class="card"><div class="ic">🚽</div><h3>Toilet Repair</h3><p>Running, clogged, or leaking toilets fixed or replaced same visit.</p></div>
+      <div class="card"><div class="ic">🏠</div><h3>Repiping</h3><p>Old or corroded pipes replaced with modern, long-lasting materials.</p></div>
+      <div class="card"><div class="ic">🛠️</div><h3>Fixture Installs</h3><p>Faucets, sinks, garbage disposals & more — installed clean and guaranteed.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY ============ -->
+<section class="pad why" id="why">
+  <div class="wrap">
+    <p class="eyebrow">Why AquaFix</p>
+    <h2 class="sec">Toronto Trusts Us Because…</h2>
+    <p class="lead">Thousands of homeowners call us first — here's why they keep coming back.</p>
+    <div class="why-grid">
+      <div class="stat"><b>60min</b><span>Average arrival time</span></div>
+      <div class="stat"><b>24/7</b><span>Real humans answer</span></div>
+      <div class="stat"><b>4.9★</b><span>612 Google reviews</span></div>
+      <div class="stat"><b>100%</b><span>Satisfaction guarantee</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="pad" id="reviews">
+  <div class="wrap">
+    <p class="eyebrow">Real Reviews</p>
+    <h2 class="sec">Loved by Toronto Homeowners</h2>
+    <p class="lead">Don't take our word for it — here's what your neighbours say.</p>
+    <div class="rev-grid">
+      <div class="rev"><div class="stars">★★★★★</div><p>"Burst pipe at 2am and they were here in 40 minutes. Calm, clean, and fixed it fast. Lifesavers."</p><div class="who">— Priya M., North York</div></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>"Booked through their chat in like two minutes. No phone tag, upfront price, done same day."</p><div class="who">— Dave R., Etobicoke</div></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>"Honest pricing and they texted me the moment I reached out. Best plumbing experience I've had."</p><div class="who">— Sofia L., Scarborough</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA BAND ============ -->
+<section class="pad" id="book">
+  <div class="wrap">
+    <div class="band">
+      <h2>Need a Plumber Right Now?</h2>
+      <p>Call us or book in 30 seconds with our AI assistant. We'll confirm by text immediately.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="tel:+14165550199" class="btn">📞 (416) 555-0199</a>
+        <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:2px solid #fff" onclick="openChat()">💬 Book Online</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div class="logo"><span class="drop">💧</span> AquaFix Plumbing</div>
+      <p style="margin-top:10px;max-width:320px">Licensed & insured emergency plumbers serving the Greater Toronto Area 24/7.</p>
+    </div>
+    <div>
+      <p><b style="color:#fff">Call:</b> (416) 555-0199</p>
+      <p><b style="color:#fff">Email:</b> help@aquafixplumbing.ca</p>
+      <p><b style="color:#fff">Hours:</b> 24/7 — Always Open</p>
+      <p style="margin-top:12px;font-size:13px;opacity:.7">Demo site built for AI agency prospecting. Not a real business.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ CHAT WIDGET ============ -->
+<button id="chatBtn" onclick="openChat()"><span class="pulse"></span> 💬 Chat with us</button>
+
+<div id="chatWin">
+  <div class="chat-head">
+    <div class="av">💧</div>
+    <div class="t"><b>Aqua</b><br><small><span class="dot"></span> AquaFix Assistant · online</small></div>
+    <button class="x" onclick="closeChat()">×</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="quick" id="quickReplies"></div>
+  <div class="chat-input">
+    <input id="chatInput" placeholder="Type your message…" autocomplete="off"
+           onkeydown="if(event.key==='Enter')sendMsg()">
+    <button onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   AquaFix AI Chat Assistant  —  demo "brain"
+   Handles: FAQs (hours, pricing, area, emergency, services)
+            + a guided booking flow that captures a lead.
+   This is a rule/intent based demo. To make responses fully
+   generative, swap answerFor() to call an LLM API.
+   ============================================================ */
+
+const chatBody = document.getElementById('chatBody');
+const quickBox = document.getElementById('quickReplies');
+const input    = document.getElementById('chatInput');
+let started = false;
+
+// booking state machine
+let booking = { active:false, step:null, name:'', phone:'', issue:'' };
+
+function openChat(){
+  document.getElementById('chatWin').classList.add('open');
+  document.getElementById('chatBtn').style.display='none';
+  input.focus();
+  if(!started){ started=true; greet(); }
+}
+function closeChat(){
+  document.getElementById('chatWin').classList.remove('open');
+  document.getElementById('chatBtn').style.display='flex';
+}
+
+function scroll(){ chatBody.scrollTop = chatBody.scrollHeight; }
+
+function addMsg(text, who){
+  const d=document.createElement('div');
+  d.className='msg '+(who==='me'?'me':'bot');
+  d.innerHTML=text;
+  chatBody.appendChild(d); scroll();
+}
+function addLeadCard(html){
+  const d=document.createElement('div');
+  d.className='lead-card'; d.innerHTML=html;
+  chatBody.appendChild(d); scroll();
+}
+function typing(cb, delay=750){
+  const t=document.createElement('div');
+  t.className='typing'; t.innerHTML='<span></span><span></span><span></span>';
+  chatBody.appendChild(t); scroll();
+  setTimeout(()=>{ t.remove(); cb(); }, delay);
+}
+function botSay(text, delay){ typing(()=>addMsg(text,'bot'), delay); }
+
+function setQuick(list){
+  quickBox.innerHTML='';
+  list.forEach(q=>{
+    const b=document.createElement('button');
+    b.textContent=q; b.onclick=()=>{ handle(q); };
+    quickBox.appendChild(b);
+  });
+}
+
+function greet(){
+  botSay("Hi! I'm Aqua, AquaFix's assistant 👋 I can give you a price, check our schedule, or book a plumber for you right now. What's going on?", 500);
+  setTimeout(()=>setQuick(["I have an emergency 🚨","Get a price","Book a visit","What areas do you serve?"]), 1300);
+}
+
+function sendMsg(){
+  const v=input.value.trim();
+  if(!v) return;
+  input.value='';
+  handle(v);
+}
+
+function handle(text){
+  addMsg(text,'me');
+  quickBox.innerHTML='';
+  if(booking.active){ bookingFlow(text); return; }
+  route(text);
+}
+
+/* ---------- intent routing ---------- */
+function route(t){
+  const s=t.toLowerCase();
+  if(/(emergency|urgent|burst|flood|leak|now|asap|24)/.test(s)){
+    botSay("Oh no — that sounds urgent. 🚨 We have plumbers on call <b>24/7</b> and can usually be there in <b>under 60 minutes</b>. Let me get someone dispatched to you. First — what's your name?", 700);
+    startBooking(); return;
+  }
+  if(/(price|cost|quote|how much|charge|\$|estimate|fee)/.test(s)){
+    botSay("Great question! Here's our upfront pricing 💲<br>• Drain cleaning — from <b>$149</b><br>• Water heater repair — from <b>$189</b><br>• Leak detection — from <b>$129</b><br>• Installs — <b>free estimate</b><br><br>Exact price depends on the job, and there are <b>no hidden fees</b>. Want me to book a free assessment?", 850);
+    setTimeout(()=>setQuick(["Yes, book me in","What areas do you serve?"]),1600); return;
+  }
+  if(/(area|serve|location|toronto|near|where|gta|zip|postal)/.test(s)){
+    botSay("We cover the entire <b>Greater Toronto Area</b> 🗺️ — including North York, Scarborough, Etobicoke, Mississauga, Vaughan and downtown. Where are you located?", 750);
+    setTimeout(()=>setQuick(["Book a visit","I have an emergency 🚨"]),1500); return;
+  }
+  if(/(hour|open|time|when|late|night|weekend)/.test(s)){
+    botSay("We're open <b>24 hours a day, 7 days a week</b> ⏰ — including weekends and holidays. Real humans answer, and if we ever miss you, our system texts you back within 60 seconds. Want to book a time?", 800);
+    setTimeout(()=>setQuick(["Book a visit","Get a price"]),1600); return;
+  }
+  if(/(book|appointment|schedule|visit|come|send|dispatch)/.test(s)){
+    botSay("Perfect — I'll get you booked in. 📅 What's your name?", 600);
+    startBooking(); return;
+  }
+  if(/(drain|clog|block|toilet|heater|hot water|pipe|faucet|tap|install|sink|sewer|repipe)/.test(s)){
+    botSay("Yep, that's right in our wheelhouse — our licensed team handles that every day. 🛠️ I can book a plumber to take a look. Want me to set that up?", 800);
+    setTimeout(()=>setQuick(["Yes, book me in","How much will it cost?"]),1600); return;
+  }
+  if(/(thank|thanks|great|awesome|ok|okay|cool)/.test(s)){
+    botSay("You're welcome! 😊 Anything else I can help with, or shall I book a plumber for you?", 600);
+    setTimeout(()=>setQuick(["Book a visit","No, I'm good"]),1200); return;
+  }
+  if(/(no|good|nothing|bye)/.test(s)){
+    botSay("No problem at all! Whenever you need us, we're here 24/7. Just tap the chat or call (416) 555-0199. Take care! 👋", 600); return;
+  }
+  // fallback
+  botSay("Good question! I can help with pricing, our service areas, hours, or booking a plumber. The fastest thing is usually to book a quick visit — want me to set that up?", 850);
+  setTimeout(()=>setQuick(["Book a visit","Get a price","Talk to a human"]),1700);
+}
+
+/* ---------- booking flow (lead capture) ---------- */
+function startBooking(){ booking={active:true,step:'name',name:'',phone:'',issue:''}; }
+
+function bookingFlow(text){
+  if(booking.step==='name'){
+    booking.name=text.replace(/^(i'?m|my name is|it'?s)\s+/i,'').trim();
+    booking.step='phone';
+    botSay(`Nice to meet you, <b>${escapeHtml(booking.name.split(' ')[0])}</b>! 📱 What's the best phone number to reach you? (We'll text a confirmation right away.)`, 700);
+    return;
+  }
+  if(booking.step==='phone'){
+    booking.phone=text.trim();
+    booking.step='issue';
+    botSay("Got it. 👍 And briefly — what's the plumbing problem? (e.g. 'kitchen sink is clogged', 'no hot water')", 700);
+    return;
+  }
+  if(booking.step==='issue'){
+    booking.issue=text.trim();
+    booking.step='done'; booking.active=false;
+    typing(()=>{
+      addMsg(`Perfect — you're all set, <b>${escapeHtml(booking.name.split(' ')[0])}</b>! ✅ A licensed AquaFix plumber will call/text you within the next few minutes to confirm a time.`,'bot');
+      setTimeout(()=>{
+        addLeadCard(
+          `<b>✅ New Lead Captured & Sent to AquaFix</b>
+           👤 Name: ${escapeHtml(booking.name)}<br>
+           📱 Phone: ${escapeHtml(booking.phone)}<br>
+           🛠️ Issue: ${escapeHtml(booking.issue)}<br>
+           ⏱️ ${new Date().toLocaleString()}<br>
+           <span style="opacity:.7">→ In a live setup this instantly texts the owner + auto-replies to the customer.</span>`
+        );
+      },500);
+      setTimeout(()=>{
+        botSay("Is there anything else I can help you with in the meantime?",600);
+        setTimeout(()=>setQuick(["What should I do right now?","No, thanks!"]),1200);
+      },1400);
+    }, 900);
+    return;
+  }
+}
+
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+</script>
+</body>
+</html>
