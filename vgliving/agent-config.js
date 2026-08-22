@@ -37,7 +37,7 @@ const LIFE_SAFETY = {
     "1. Leave the unit now and get everyone out with you.<br>" +
     "2. Don't use light switches, appliances or the elevator.<br>" +
     "3. Once you're outside, call <b>911</b>.<br>" +
-    "4. If you smell gas, also call Enbridge at <b>1-866-763-5427</b>.<br><br>" +
+    "4. If you smell gas, also call Enbridge at <b>1-XXX-XXX-XXXX</b>.<br><br>" +
     "I've alerted VG Living's on-call manager with your unit number right now. " +
     "Do not wait for a reply from me — make the call."
 };
@@ -57,7 +57,7 @@ const LEGAL_GUARDRAIL = {
     "That's a tenancy-law question, and I'm not the right one to answer it — " +
     "getting it wrong could cost you or the owner real money, so I won't guess.<br><br>" +
     "I've flagged this for VG Living's management team and they'll follow up directly. " +
-    "You can also reach them at <b>contact@vgliving.ca</b> or <b>+1 (289) 652-2484</b>.<br><br>" +
+    "You can also reach them at <b>contact@vgliving.ca</b> or <b>+1 (XXX) XXX-XXXX</b>.<br><br>" +
     "Anything on the maintenance side I <i>can</i> take care of right now?"
 };
 
@@ -209,7 +209,7 @@ const GENERAL_INTENTS = [
           "If this is about being short this month, tell the management team early rather than late — reach them at <b>contact@vgliving.ca</b>. I'll leave that with a human." },
   { id:'hours',   match:['hours','open','what time','after hours','weekend'],
     reply:"For maintenance, I'm here <b>24/7</b> — that's the point of me. Emergencies get dispatched immediately, any hour.<br><br>" +
-          "Routine requests logged overnight get picked up first thing. The office line is <b>+1 (289) 652-2484</b> (select <b>Care</b>)." },
+          "Routine requests logged overnight get picked up first thing. The office line is <b>+1 (XXX) XXX-XXXX</b> (select <b>Care</b>)." },
   { id:'status',  match:['status','update','any news','when is someone coming','still waiting','eta'],
     reply:"I can check that. What's your <b>unit number</b>? I'll pull up the work order and tell you exactly where it stands and who's assigned." },
   { id:'owner',   match:['i own','my property','manage my','landlord','investment property','what do you charge','management fee','rental analysis','what should my property rent'],
@@ -227,7 +227,7 @@ const GENERAL_INTENTS = [
   { id:'thanks',  match:['thank','thanks','appreciate','cheers','great'],
     reply:"Any time. 🙂 Anything else while I'm here?" },
   { id:'bye',     match:['bye','goodbye','that\'s all','thats all','nothing else','all good'],
-    reply:"Take care. If anything changes, message me any hour — <b>+1 (289) 652-2484</b>, select Care." }
+    reply:"Take care. If anything changes, message me any hour — <b>+1 (XXX) XXX-XXXX</b>, select Care." }
 ];
 
 /* ------------------------------------------------------------
@@ -256,4 +256,4 @@ const CHANNELS = [
 const FALLBACK =
   "I want to make sure I get this right rather than guess. Can you tell me a bit more — " +
   "what's the problem, and which <b>unit</b> are you in?<br><br>" +
-  "If it's easier, call <b>+1 (289) 652-2484</b> and select <b>Care</b>, or I can pass this to a human on the VG team now.";
+  "If it's easier, call <b>+1 (XXX) XXX-XXXX</b> and select <b>Care</b>, or I can pass this to a human on the VG team now.";

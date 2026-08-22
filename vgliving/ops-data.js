@@ -10,8 +10,8 @@ const PORTFOLIO = {
   company: {
     name: 'VG Living',
     legal: 'VoraG Living Inc.',
-    phone: '+1 (289) 652-2484',
-    phoneDial: '+12896522484',
+    phone: '+1 (XXX) XXX-XXXX',
+    phoneDial: '+1XXXXXXXXXX',
     careEmail: 'care@vgliving.ca',
     rentEmail: 'rent@vgliving.ca',
     ownerEmail: 'contact@vgliving.ca',
