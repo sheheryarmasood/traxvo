@@ -71,6 +71,7 @@
   /* HERO */
   .hero{position:relative;padding:170px 0 90px;overflow:hidden}
   .hero .cgrid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(ellipse 70% 80% at 78% 40%,#000,transparent 72%);opacity:.6}
+  .hero .radar{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;mask-image:radial-gradient(ellipse 70% 80% at 78% 40%,#000,transparent 74%);-webkit-mask-image:radial-gradient(ellipse 70% 80% at 78% 40%,#000,transparent 74%)}
   .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.25fr .75fr;gap:56px;align-items:center}
   .hero .eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:30px}
   .hero .eyebrow .rule{height:2px;width:40px;background:var(--accent)}
@@ -208,6 +209,7 @@
 <!-- HERO -->
 <section class="hero">
   <div class="cgrid"></div>
+  <canvas class="radar" id="radar" aria-hidden="true"></canvas>
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow rv"><span class="rule"></span><span class="kicker">Marketing Intelligence, Engineered</span></div>
@@ -286,6 +288,24 @@
         <div class="desc">A calm, on-brand concierge that turns late-night browsers into booked consultations.</div>
         <div class="visit">Visit site <span class="arw">→</span></div>
       </a>
+      <a href="vgliving/" target="_blank" class="case rv">
+        <span class="idx">(03)</span>
+        <div>
+          <div class="name">VG Living</div>
+          <div class="tags"><span>Property Management</span><span>Ops Automation</span><span>2026</span></div>
+        </div>
+        <div class="desc">An autonomous maintenance agent that triages tenant issues, escalates life-safety calls instantly, and dispatches the right vendor without a human in the loop.</div>
+        <div class="visit">Visit site <span class="arw">&rarr;</span></div>
+      </a>
+      <a href="tidynest/" target="_blank" class="case rv">
+        <span class="idx">(04)</span>
+        <div>
+          <div class="name">TidyNest Cleaning</div>
+          <div class="tags"><span>Home Cleaning</span><span>Booking &amp; Dispatch</span><span>2026</span></div>
+        </div>
+        <div class="desc">A booking agent that prices a clean over text in seconds, fills cancelled slots, and runs the crew schedule without an office manager.</div>
+        <div class="visit">Visit site <span class="arw">&rarr;</span></div>
+      </a>
     </div>
   </div>
 </section>
@@ -346,8 +366,13 @@
             <textarea id="f-msg" name="message" rows="3" placeholder="What does your business do? (optional)"></textarea>
             <button type="submit" class="btn btn-primary" id="f-submit">Request my free audit <span class="arw">→</span></button>
           </form>
-          <div class="form-note">Replies within one business day · No spam, ever</div>
+          <div class="form-note" id="formNote">Replies within one business day · No spam, ever</div>
           <div class="ok" id="okMsg">Thank you, <b id="okName">friend</b> — your request is in. We'll be in touch within one business day.</div>
+          <div class="ok" id="okFallback">
+            <b>One last step, <span id="fbName">friend</span>.</b><br>
+            Tap below to send your details — it opens your email app with everything already filled in.
+            <a class="btn btn-primary" id="fbLink" href="mailto:hello@traxvo.com" style="margin-top:18px;width:100%;justify-content:center">Send my request <span class="arw">&#8594;</span></a>
+          </div>
         </div>
       </div>
     </div>
@@ -410,29 +435,156 @@ if('IntersectionObserver' in window){
   document.body.appendChild(s);
 })();
 
-/* booking form — validates, then delivers via Web3Forms if a key is set,
-   otherwise falls back to on-page confirmation so the form is never broken. */
+/* HERO LEAD RADAR
+   Leads drift across the field. The sweep locks most of them; the rest slip
+   past and fade out at the edge — the pitch, drawn. Pauses off-screen and
+   when the tab is hidden, and holds a single static frame if the visitor
+   has asked for reduced motion. */
+(function(){
+  var cv=document.getElementById('radar');
+  if(!cv||!cv.getContext)return;
+  var ctx=cv.getContext('2d');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ACCENT='236,48,19', INK='32,30,29';
+  var w=0,h=0,dots=[],sweep=0,raf=0,last=0,onScreen=true;
+  var SWEEP_SECS=7;
+
+  function size(){
+    var r=cv.getBoundingClientRect(), dpr=Math.min(window.devicePixelRatio||1,2);
+    w=r.width; h=r.height;
+    if(!w||!h)return false;
+    cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return true;
+  }
+  function mk(atLeft){
+    return {x: atLeft? -10-Math.random()*60 : Math.random()*w,
+            y: 12+Math.random()*(h-24),
+            vx: 7+Math.random()*13,          // px per second
+            vy: (Math.random()-0.5)*3,
+            r: 1.3+Math.random()*1.9,
+            keep: Math.random()<0.62,        // does the agent catch this one?
+            seen:false, lockT:0, fade:1};
+  }
+  function seed(){
+    var n=Math.max(16,Math.min(38,Math.round(w*h/17000)));
+    dots=[]; for(var i=0;i<n;i++)dots.push(mk(false));
+  }
+  function step(dt){
+    sweep+=(w+160)/SWEEP_SECS*dt;
+    if(sweep>w+120){                     // new pass — the field goes cold again
+      sweep=-40;
+      for(var j=0;j<dots.length;j++){
+        var q=dots[j];
+        if(q.seen&&!q.keep)continue;     // a lead already slipping away keeps slipping
+        q.seen=false; q.lockT=0; q.keep=Math.random()<0.62;
+      }
+    }
+    for(var i=0;i<dots.length;i++){
+      var d=dots[i];
+      d.x+=d.vx*dt; d.y+=d.vy*dt;
+      if(!d.seen && sweep>=d.x){ d.seen=true; if(d.keep)d.lockT=1.15; }
+      if(d.lockT>0)d.lockT=Math.max(0,d.lockT-dt);
+      if(d.seen && !d.keep)d.fade=Math.max(0,d.fade-dt*0.17);
+      if(d.x>w+30)dots[i]=mk(true);        // drifted off the right edge
+      else if(d.fade<=0)dots[i]=mk(false); // missed and gone — reappears anywhere
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    // sweep: a soft leading edge, brightest at the line itself
+    if(!reduce && sweep>-40){
+      var g=ctx.createLinearGradient(sweep-120,0,sweep,0);
+      g.addColorStop(0,'rgba('+ACCENT+',0)');
+      g.addColorStop(1,'rgba('+ACCENT+',0.10)');
+      ctx.fillStyle=g; ctx.fillRect(sweep-120,0,120,h);
+      ctx.fillStyle='rgba('+ACCENT+',0.22)'; ctx.fillRect(sweep,0,1,h);
+    }
+    for(var i=0;i<dots.length;i++){
+      var d=dots[i], locked=d.seen&&d.keep;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle = locked ? 'rgba('+ACCENT+','+(0.88*d.fade)+')'
+                             : 'rgba('+INK+','+(0.42*d.fade)+')';
+      ctx.fill();
+      if(d.lockT>0){                       // corner brackets snapping shut
+        var k=d.lockT/1.15, sp=4+k*7, ln=3.2, a=Math.min(1,k*2.4);
+        ctx.strokeStyle='rgba('+ACCENT+','+a+')'; ctx.lineWidth=1.1;
+        for(var c=0;c<4;c++){
+          var sx=(c===0||c===3)?-1:1, sy=(c<2)?-1:1;
+          ctx.beginPath();
+          ctx.moveTo(d.x+sx*sp, d.y+sy*sp-sy*ln);
+          ctx.lineTo(d.x+sx*sp, d.y+sy*sp);
+          ctx.lineTo(d.x+sx*sp-sx*ln, d.y+sy*sp);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  function frame(ts){
+    if(!last)last=ts;
+    var dt=Math.min((ts-last)/1000,0.05); last=ts;
+    step(dt); draw();
+    raf=requestAnimationFrame(frame);
+  }
+  function start(){ if(raf||reduce)return; last=0; raf=requestAnimationFrame(frame); }
+  function stop(){ if(raf)cancelAnimationFrame(raf); raf=0; }
+
+  if(!size())return;
+  seed();
+  if(reduce){                              // one considered still frame
+    sweep=w*0.62;
+    for(var i=0;i<dots.length;i++){ var d=dots[i]; d.seen=d.x<sweep; }
+    draw();
+  } else start();
+
+  var rt;
+  window.addEventListener('resize',function(){
+    clearTimeout(rt);
+    rt=setTimeout(function(){ if(size()){ seed(); if(reduce)draw(); } },180);
+  });
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden)stop(); else if(onScreen)start();
+  });
+  if(window.IntersectionObserver){
+    new IntersectionObserver(function(es){
+      onScreen=es[0].isIntersecting;
+      if(onScreen&&!document.hidden)start(); else stop();
+    },{threshold:0}).observe(cv);
+  }
+})();
+
+/* booking form — validates, then delivers via Web3Forms if a key is set.
+   If no key is configured, or the send fails, we NEVER fake a success:
+   the visitor gets a prefilled email instead, so a lead is never lost. */
 document.getElementById('bookForm').addEventListener('submit',async function(ev){
   ev.preventDefault();
   const g=id=>document.getElementById(id);
-  const name=g('f-name').value.trim(),biz=g('f-biz').value.trim(),contact=g('f-contact').value.trim();
+  const name=g('f-name').value.trim(),biz=g('f-biz').value.trim(),
+        contact=g('f-contact').value.trim(),msg=g('f-msg').value.trim();
   let bad=false;
   [['f-name',name],['f-biz',biz],['f-contact',contact]].forEach(([id,v])=>{g(id).style.borderColor=v?'':'#ec3013';if(!v)bad=true;});
   if(bad)return;
-  const done=()=>{this.style.display='none';g('okName').textContent=name.split(' ')[0];g('okMsg').style.display='block';};
+  const first=name.split(' ')[0];
+  const hideForm=()=>{this.style.display='none';g('formNote').style.display='none';};
+  const delivered=()=>{hideForm();g('okName').textContent=first;g('okMsg').style.display='block';};
+  const handoff=()=>{
+    const NL=String.fromCharCode(10);
+    const body=['Name: '+name,'Business: '+biz,'Contact: '+contact].join(NL)+(msg?NL+NL+'About the business:'+NL+msg:'');
+    g('fbLink').href='mailto:hello@traxvo.com?subject='+encodeURIComponent('Free audit request — '+biz)+'&body='+encodeURIComponent(body);
+    g('fbName').textContent=first;
+    hideForm();g('okFallback').style.display='block';
+  };
   const key=g('f-key').value;
-  if(key && key.indexOf('PASTE_YOUR')===-1){
-    const btn=g('f-submit'); btn.textContent='Sending…'; btn.disabled=true;
-    try{
-      const res=await fetch('https://api.web3forms.com/submit',{
-        method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
-        body:JSON.stringify(Object.fromEntries(new FormData(this)))
-      });
-      const out=await res.json();
-      if(out.success){done();}
-      else{btn.disabled=false;btn.innerHTML='Request my free audit <span class="arw">→</span>';alert('Something went wrong sending your request. Please email hello@traxvo.com.');}
-    }catch(e){btn.disabled=false;btn.innerHTML='Request my free audit <span class="arw">→</span>';alert('Network error. Please email hello@traxvo.com.');}
-  }else{ done(); }
+  if(!key||key.indexOf('PASTE_YOUR')!==-1){handoff();return;}
+  const btn=g('f-submit');btn.textContent='Sending…';btn.disabled=true;
+  try{
+    const res=await fetch('https://api.web3forms.com/submit',{
+      method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify(Object.fromEntries(new FormData(this)))
+    });
+    const out=await res.json();
+    if(out.success){delivered();}else{handoff();}
+  }catch(e){handoff();}
 });
 </script>
 </body>

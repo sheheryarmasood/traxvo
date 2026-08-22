@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VG Care Ops — Autonomous Maintenance Agent</title>
+<style>
+  :root{
+    --gold:#E9BE61; --gold-dim:#BB9039; --cream:#F7EACD;
+    --ink:#080808; --panel:#101317; --panel2:#161a20; --card:#1b2027;
+    --line:#272c34; --line2:#333944;
+    --txt:#e9e7e4; --muted:#8b929c; --dim:#666d77;
+    --red:#e5484d; --green:#3fb950; --blue:#4a9eff;
+    --font:'Inter','Roboto',-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--ink);color:var(--txt);line-height:1.5;
+       font-size:14px;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex;align-items:center;gap:18px;padding:14px 22px;
+          background:linear-gradient(180deg,#0d1014,#0a0c0f);border-bottom:1px solid var(--line);
+          position:sticky;top:0;z-index:50;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mark{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:8px;
+               display:grid;place-items:center;color:var(--gold);font-weight:800;font-size:14px;letter-spacing:.5px}
+  .brand b{font-size:16px;letter-spacing:.3px}
+  .brand small{display:block;color:var(--gold);font-size:11px;letter-spacing:1.6px;text-transform:uppercase;font-weight:600}
+  .sep{width:1px;height:30px;background:var(--line)}
+  .clock{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+  .clock b{color:var(--txt);font-weight:600}
+  .toggle{background:var(--card);border:1px solid var(--line2);color:var(--txt);
+          padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;transition:.15s}
+  .toggle:hover{border-color:var(--gold);color:var(--gold)}
+  .toggle.night{background:#1a1526;border-color:#3d3159;color:#c9b8f0}
+  .scenarios{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .scn{background:transparent;border:1px solid var(--line2);color:var(--muted);
+       padding:8px 13px;border-radius:7px;font-size:12px;font-weight:600;transition:.15s;
+       display:flex;align-items:center;gap:7px}
+  .scn:hover:not(:disabled){border-color:var(--gold);color:var(--gold);background:rgba(233,190,97,.06)}
+  .scn:disabled{opacity:.35;cursor:not-allowed}
+  .scn .n{width:17px;height:17px;border-radius:50%;background:var(--line2);color:var(--txt);
+          display:grid;place-items:center;font-size:10px;font-weight:800}
+  .scn:hover:not(:disabled) .n{background:var(--gold);color:#000}
+  .scn.reset{border-color:transparent;color:var(--dim)}
+  .scn.reset:hover{color:var(--red);border-color:var(--red)}
+
+  /* ---------- stat strip ---------- */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+         border-bottom:1px solid var(--line)}
+  .stat{background:var(--panel);padding:13px 20px}
+  .stat .k{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:1.1px;font-weight:700}
+  .stat .v{font-size:23px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+  .stat .v.gold{color:var(--gold)} .stat .v.green{color:var(--green)}
+  .stat .v small{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:0}
+  .flash{animation:flash .7s ease}
+  @keyframes flash{0%{background:rgba(233,190,97,.22)}100%{background:transparent}}
+
+  /* ---------- layout ---------- */
+  .shell{display:grid;grid-template-columns:392px 1fr;gap:1px;background:var(--line);
+         min-height:calc(100vh - 132px);align-items:stretch}
+  .left{background:var(--panel);display:flex;flex-direction:column;min-height:0}
+  .right{background:var(--ink);padding:20px;display:flex;flex-direction:column;gap:20px;min-width:0}
+
+  /* ---------- tenant channel ---------- */
+  .chan-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px;
+             background:var(--panel2)}
+  .chan-head .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+                 display:grid;place-items:center;color:#000;font-weight:800;font-size:15px}
+  .chan-head .t b{font-size:14px;display:block}
+  .chan-head .t small{color:var(--muted);font-size:11.5px;display:flex;align-items:center;gap:6px}
+  .chan-head .dot{width:7px;height:7px;background:var(--green);border-radius:50%}
+  .chan-tag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--dim);
+            border:1px solid var(--line2);padding:4px 8px;border-radius:5px}
+  .thread{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:11px;
+          background:radial-gradient(ellipse at top,#12161b,#0c0f13);min-height:420px;max-height:calc(100vh - 300px)}
+  .who{font-size:10.5px;color:var(--dim);font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+       margin:8px 0 -4px;display:flex;align-items:center;gap:7px}
+  .who:before{content:'';flex:1;height:1px;background:var(--line)}
+  .who:after{content:'';flex:1;height:1px;background:var(--line)}
+  .msg{max-width:84%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5;
+       animation:pop .2s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  .msg.bot{background:var(--card);border:1px solid var(--line2);border-bottom-left-radius:4px;align-self:flex-start}
+  .msg.me{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#0a0a0a;font-weight:500;
+          border-bottom-right-radius:4px;align-self:flex-end}
+  .msg.sys{align-self:center;background:transparent;border:1px dashed var(--line2);color:var(--muted);
+           font-size:11.5px;text-align:center;max-width:95%;border-radius:8px;padding:8px 12px}
+  .msg.alert{background:rgba(229,72,77,.11);border:1px solid var(--red);color:#ffb3b5;align-self:flex-start;max-width:95%}
+  .typing{display:flex;gap:4px;padding:13px 15px;background:var(--card);border:1px solid var(--line2);
+          border-radius:14px;align-self:flex-start;width:fit-content}
+  .typing span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:blink 1.3s infinite}
+  .typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  .quick{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 12px}
+  .quick button{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);
+                font-size:12px;font-weight:600;padding:7px 12px;border-radius:100px;transition:.12s}
+  .quick button:hover{background:var(--gold);color:#000}
+  .composer{display:flex;gap:9px;padding:13px;border-top:1px solid var(--line);background:var(--panel2)}
+  .composer input{flex:1;background:var(--ink);border:1px solid var(--line2);color:var(--txt);
+                  border-radius:9px;padding:11px 14px;font-size:13.5px;outline:none;font-family:inherit}
+  .composer input:focus{border-color:var(--gold)}
+  .composer button{background:var(--gold);color:#000;border:none;border-radius:9px;width:44px;font-size:16px;font-weight:700}
+
+  /* ---------- ops board ---------- */
+  .sec-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .sec-title h2{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}
+  .sec-title .line{flex:1;height:1px;background:var(--line)}
+  .sec-title .hint{font-size:11px;color:var(--dim)}
+  .board{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}
+  .col{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px;min-height:190px;
+       display:flex;flex-direction:column;gap:9px}
+  .col-h{display:flex;align-items:center;justify-content:space-between;font-size:10.5px;font-weight:800;
+         letter-spacing:1.1px;text-transform:uppercase;color:var(--dim);padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .col-h .c{background:var(--line2);color:var(--txt);border-radius:20px;padding:1px 7px;font-size:10px}
+  .wo{background:var(--card);border:1px solid var(--line2);border-left-width:3px;border-radius:8px;padding:11px;
+      animation:pop .3s ease;transition:.2s}
+  .wo:hover{border-color:var(--gold-dim)}
+  .wo .id{font-size:10px;color:var(--dim);font-weight:700;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+  .wo .lbl{font-size:12.5px;font-weight:600;margin:4px 0 6px;line-height:1.35}
+  .wo .loc{font-size:11px;color:var(--muted)}
+  .wo .pill{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+            padding:2px 7px;border-radius:4px;margin-top:7px}
+  .wo .vend{font-size:11px;color:var(--gold);margin-top:7px;display:flex;align-items:center;gap:5px}
+  .wo .sla{font-size:10.5px;color:var(--dim);margin-top:5px}
+  .wo .reports{display:inline-flex;align-items:center;gap:5px;background:rgba(229,72,77,.15);color:#ff9a9d;
+               border:1px solid rgba(229,72,77,.4);font-size:10px;font-weight:700;padding:2px 7px;
+               border-radius:4px;margin-top:7px}
+  .empty{color:var(--dim);font-size:11px;text-align:center;padding:16px 0;font-style:italic}
+
+  /* ---------- feeds ---------- */
+  .duo{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}
+  .feed{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;
+        max-height:290px;overflow-y:auto}
+  .fi{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px;animation:pop .25s ease}
+  .fi:last-child{border-bottom:none}
+  .fi .ic{width:22px;height:22px;border-radius:5px;display:grid;place-items:center;font-size:11px;flex-shrink:0;
+          background:var(--line2)}
+  .fi .tx{flex:1;min-width:0}
+  .fi .tm{color:var(--dim);font-size:10.5px;font-variant-numeric:tabular-nums;flex-shrink:0}
+  .fi b{color:var(--txt);font-weight:600}
+  .fi.ok .ic{background:rgba(63,185,80,.16);color:var(--green)}
+  .fi.warn .ic{background:rgba(229,72,77,.16);color:var(--red)}
+  .fi.gold .ic{background:rgba(233,190,97,.16);color:var(--gold)}
+  .fi .sub{color:var(--muted);font-size:11.5px;margin-top:2px}
+
+  .approve{background:rgba(233,190,97,.07);border:1px solid var(--gold-dim);border-radius:8px;
+           padding:12px;margin:9px 0;animation:pop .3s ease}
+  .approve .h{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+  .approve .d{font-size:12.5px;color:var(--txt);line-height:1.55}
+  .approve .btns{display:flex;gap:8px;margin-top:11px}
+  .approve button{flex:1;padding:8px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid var(--line2);
+                  background:var(--card);color:var(--txt);transition:.15s}
+  .approve button.yes:hover{background:var(--green);border-color:var(--green);color:#000}
+  .approve button.no:hover{background:var(--red);border-color:var(--red);color:#fff}
+  .approve.done{opacity:.6}
+
+  /* channels */
+  .chgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}
+  .ch{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 12px 13px;
+      position:relative;transition:.15s}
+  .ch.live{cursor:pointer}
+  .ch.live:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+  .ch.on{border-color:var(--gold);background:rgba(233,190,97,.06)}
+  .ch.planned{opacity:.5}
+  .ch .top{display:flex;align-items:center;gap:8px;margin-bottom:5px;padding-right:52px}
+  .ch .nm{font-size:13px;font-weight:700}
+  .ch .pf{font-size:10.5px;color:var(--gold);margin-bottom:6px;font-weight:600}
+  .ch .nt{font-size:11px;color:var(--muted);line-height:1.45}
+  .ch .badge{position:absolute;top:11px;right:11px;font-size:8.5px;font-weight:800;letter-spacing:.8px;
+             padding:2px 6px;border-radius:4px}
+  .ch .badge.live{background:rgba(63,185,80,.16);color:var(--green)}
+  .ch .badge.planned{background:var(--line2);color:var(--muted)}
+
+  /* PM calendar */
+  .pm{display:flex;justify-content:space-between;align-items:center;padding:9px 0;
+      border-bottom:1px solid var(--line);font-size:12.5px;gap:10px}
+  .pm:last-child{border-bottom:none}
+  .pm .n{font-weight:600}
+  .pm .b{color:var(--dim);font-size:11px}
+  .pm .st{font-size:9.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+          padding:3px 8px;border-radius:4px;white-space:nowrap}
+  .st.scheduled{background:rgba(63,185,80,.14);color:var(--green)}
+  .st.booking{background:rgba(233,190,97,.14);color:var(--gold)}
+  .st.upcoming{background:var(--line2);color:var(--muted)}
+
+  .note{color:var(--dim);font-size:11px;padding:12px 22px 26px;border-top:1px solid var(--line);
+        background:var(--panel);line-height:1.6}
+  .note b{color:var(--muted)}
+
+  @media(max-width:1180px){
+    .shell{grid-template-columns:1fr}
+    .board{grid-template-columns:repeat(2,1fr)}
+    .duo{grid-template-columns:1fr}
+    .chgrid{grid-template-columns:repeat(2,1fr)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .thread{max-height:400px}
+  }
+  @media(max-width:640px){
+    .board{grid-template-columns:1fr}
+    .chgrid{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr}
+    .scenarios{width:100%;margin-left:0}
+    .scn{flex:1;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">VG</div>
+    <div><b>VG Living</b><small>Care Ops</small></div>
+  </div>
+  <div class="sep"></div>
+  <div class="clock">
+    <span id="clockTxt">Tue 2:14 PM</span> ·
+    <b id="clockMode">Business hours</b>
+  </div>
+  <button class="toggle" id="clockBtn" onclick="toggleClock()">Switch to after-hours</button>
+
+  <div class="scenarios">
+    <button class="scn" id="s1" onclick="runScenario('A')"><span class="n">1</span> Avoided truck roll</button>
+    <button class="scn" id="s2" onclick="runScenario('B')"><span class="n">2</span> Building-wide fault</button>
+    <button class="scn" id="s3" onclick="runScenario('C')"><span class="n">3</span> After-hours emergency</button>
+    <button class="scn reset" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat" id="stOpen"><div class="k">Open work orders</div><div class="v">0</div></div>
+  <div class="stat" id="stAvoid"><div class="k">Dispatches avoided</div><div class="v green">0</div></div>
+  <div class="stat" id="stSaved"><div class="k">Call-out cost avoided</div><div class="v green">$0</div></div>
+  <div class="stat" id="stResp"><div class="k">Avg first response</div><div class="v gold">— <small>sec</small></div></div>
+  <div class="stat" id="stSla"><div class="k">SLA breaches</div><div class="v">0</div></div>
+</div>
+
+<div class="shell">
+  <!-- ============ TENANT CHANNEL ============ -->
+  <div class="left">
+    <div class="chan-head">
+      <div class="av">V</div>
+      <div class="t">
+        <b>Vera — VG Living Care</b>
+        <small><span class="dot"></span> Online · answers 24/7</small>
+      </div>
+      <div class="chan-tag" id="chanTag">SMS</div>
+    </div>
+    <div class="thread" id="thread"></div>
+    <div class="quick" id="quick"></div>
+    <div class="composer">
+      <input id="input" placeholder="Type as a tenant…" autocomplete="off"
+             onkeydown="if(event.key==='Enter')send()">
+      <button onclick="send()">➤</button>
+    </div>
+  </div>
+
+  <!-- ============ OPS ============ -->
+  <div class="right">
+    <div>
+      <div class="sec-title">
+        <h2>Work order board</h2><div class="line"></div>
+        <span class="hint">live — cards move as the agent works</span>
+      </div>
+      <div class="board">
+        <div class="col" id="col-intake">    <div class="col-h">Intake <span class="c">0</span></div></div>
+        <div class="col" id="col-triaged">   <div class="col-h">Triaged <span class="c">0</span></div></div>
+        <div class="col" id="col-dispatched"><div class="col-h">Dispatched <span class="c">0</span></div></div>
+        <div class="col" id="col-scheduled"> <div class="col-h">Scheduled <span class="c">0</span></div></div>
+        <div class="col" id="col-resolved">  <div class="col-h">Resolved <span class="c">0</span></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-title">
+        <h2>Channels</h2><div class="line"></div>
+        <span class="hint">click a live channel to switch the tenant's inbound route</span>
+      </div>
+      <div class="chgrid" id="chGrid"></div>
+    </div>
+
+    <div class="duo">
+      <div>
+        <div class="sec-title"><h2>Dispatch &amp; escalation log</h2><div class="line"></div></div>
+        <div class="feed" id="feed">
+          <div class="empty">Nothing dispatched yet. Run a scenario, or type as a tenant on the left.</div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title"><h2>Preventive maintenance</h2><div class="line"></div>
+          <span class="hint">per contract</span></div>
+        <div class="feed" id="pmFeed"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Demo build.</b> Buildings, units, tenants and vendors are simulated stand-ins — in production the rent roll and
+  work orders come from Buildium, and vendor dispatch runs over SMS. Escalation timers are compressed for the demo
+  (the card shows the real interval). Preventive-maintenance intervals shown are per service contract, not asserted
+  statutory minimums. Company details, phone, <b>care@vgliving.ca</b> and the Brantford listing are real, from vgliving.ca.
+</div>
+
+<script src="ops-data.js"></script>
+<script src="agent-config.js"></script>
+<script>
+/* ============================================================
+   VG Care Ops — demo engine
+   Runs the real rule set in agent-config.js. Scenario buttons
+   drive the same code path a typed message does.
+   ============================================================ */
+
+const thread = document.getElementById('thread');
+const quickBox = document.getElementById('quick');
+const input = document.getElementById('input');
+const feed = document.getElementById('feed');
+
+let state, conv, scenarioQueue = [], scenarioRunning = false;
+/* One turn at a time. Without this, someone typing mid-scenario interleaves
+   two async turns and the thread renders out of order. */
+let busy = false;
+/* Generation token. Reset bumps it, which halts any dispatch chain still
+   in flight from the previous scenario instead of letting it write into
+   the new board. */
+let gen = 0;
+
+function initState(){
+  state = { woSeq: 4100, orders: [], avoided:0, saved:0, responses:[], breaches:0, night:false };
+  conv  = { tenant:null, stage:'idle', rule:null, deflect:null, lastWho:null };
+}
+
+/* ---------------- clock ---------------- */
+function timeStr(){ return state.night ? 'Tue 11:47 PM' : 'Tue 2:14 PM'; }
+function toggleClock(){
+  state.night = !state.night;
+  document.getElementById('clockTxt').textContent = timeStr();
+  document.getElementById('clockMode').textContent = state.night ? 'After hours' : 'Business hours';
+  const b = document.getElementById('clockBtn');
+  b.textContent = state.night ? 'Switch to business hours' : 'Switch to after-hours';
+  b.classList.toggle('night', state.night);
+}
+
+/* ---------------- thread helpers ---------------- */
+function whoLabel(t){
+  if(!t) return;
+  const tag = t.name + ' · Unit ' + t.unit + ' · ' + findBuilding(t.building).name;
+  if(conv.lastWho === tag) return;
+  conv.lastWho = tag;
+  const d = document.createElement('div'); d.className='who'; d.textContent = tag;
+  thread.appendChild(d);
+}
+function add(text, cls){
+  const d = document.createElement('div'); d.className='msg '+cls; d.innerHTML=text;
+  thread.appendChild(d); thread.scrollTop = thread.scrollHeight; return d;
+}
+function say(text, delay, cls){
+  const g = gen;
+  return new Promise(res=>{
+    const t=document.createElement('div'); t.className='typing';
+    t.innerHTML='<span></span><span></span><span></span>';
+    thread.appendChild(t); thread.scrollTop = thread.scrollHeight;
+    setTimeout(()=>{
+      t.remove();
+      if(g !== gen) return;          // superseded by a reset — stop this chain
+      add(text, cls||'bot');
+      // "First response" means the tenant's first reply, not full resolution.
+      if(conv.turnStart){
+        state.responses.push(Math.max(1, Math.round((Date.now()-conv.turnStart)/1000)));
+        conv.turnStart = null; renderStats();
+      }
+      res();
+    }, delay||900);
+  });
+}
+function sys(text){ add(text,'sys'); }
+function setQuick(list){
+  quickBox.innerHTML='';
+  (list||[]).forEach(q=>{
+    const b=document.createElement('button'); b.textContent=q;
+    b.onclick=()=>{ quickBox.innerHTML=''; handle(q); };
+    quickBox.appendChild(b);
+  });
+}
+const wait = ms => { const g = gen; return new Promise(r=>setTimeout(()=>{ if(g===gen) r(); }, ms)); };
+
+/* ---------------- stats ---------------- */
+function bump(id){ const e=document.getElementById(id); e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); }
+function renderStats(){
+  const open = state.orders.filter(o=>o.col!=='resolved').length;
+  document.querySelector('#stOpen .v').textContent = open;
+  document.querySelector('#stAvoid .v').textContent = state.avoided;
+  document.querySelector('#stSaved .v').textContent = '$'+state.saved.toLocaleString();
+  const avg = state.responses.length
+    ? Math.round(state.responses.reduce((a,b)=>a+b,0)/state.responses.length) : null;
+  document.querySelector('#stResp .v').innerHTML = (avg===null?'—':avg)+' <small>sec</small>';
+  document.querySelector('#stSla .v').textContent = state.breaches;
+}
+
+/* ---------------- feed ---------------- */
+function logFeed(icon, html, kind, sub){
+  if(feed.querySelector('.empty')) feed.innerHTML='';
+  const d=document.createElement('div'); d.className='fi '+(kind||'');
+  d.innerHTML = `<div class="ic">${icon}</div><div class="tx">${html}${sub?`<div class="sub">${sub}</div>`:''}</div>
+                 <div class="tm">${timeStr().split(' ').slice(1).join(' ')}</div>`;
+  feed.appendChild(d); feed.scrollTop = feed.scrollHeight;
+}
+
+/* ---------------- board ---------------- */
+const COLS = ['intake','triaged','dispatched','scheduled','resolved'];
+function renderBoard(){
+  COLS.forEach(c=>{
+    const col = document.getElementById('col-'+c);
+    const items = state.orders.filter(o=>o.col===c);
+    col.querySelector('.c').textContent = items.length;
+    col.querySelectorAll('.wo,.empty').forEach(n=>n.remove());
+    if(!items.length){
+      const e=document.createElement('div'); e.className='empty'; e.textContent='—'; col.appendChild(e);
+    }
+    items.forEach(o=>col.appendChild(woCard(o)));
+  });
+  renderStats();
+}
+function woCard(o){
+  const p = PRIORITIES[o.priority];
+  const d = document.createElement('div');
+  d.className='wo'; d.style.borderLeftColor = p.color;
+  d.innerHTML = `
+    <div class="id">WO-${o.id}</div>
+    <div class="lbl">${o.label}</div>
+    <div class="loc">${o.buildingWide ? findBuilding(o.building).name + ' · building system'
+                                       : 'Unit ' + o.unit + ' · ' + findBuilding(o.building).name}</div>
+    <span class="pill" style="background:${p.color}22;color:${p.color}">${p.label}</span>
+    ${o.reports>1 ? `<div class="reports">⚠ ${o.reports} units reporting — merged</div>` : ''}
+    ${o.vendor ? `<div class="vend">🔧 ${o.vendor}</div>` : ''}
+    ${o.sla ? `<div class="sla">${o.sla}</div>` : ''}
+    ${o.cost!=null ? `<div class="sla">Est. $${o.cost.toLocaleString()}${o.approval?' · '+o.approval:''}</div>` : ''}`;
+  return d;
+}
+function move(o, col){ o.col = col; renderBoard(); }
+
+/* ---------------- matching ---------------- */
+/* Keyword matching. The start of a keyword must fall on a word boundary,
+   so "issue" no longer trips the legal guardrail via "sue". Up to three
+   trailing letters are allowed so "gas leak" still catches "gas leakage"
+   — while "fire" stays clear of "fireplace" and "no ac" of "no access". */
+function hits(text, list){
+  const t = text.toLowerCase();
+  return list.some(k=>{
+    const esc = k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    return new RegExp('(^|[^a-z0-9])'+esc+'[a-z]{0,3}([^a-z0-9]|$)').test(t);
+  });
+}
+function extractUnit(text){
+  let m = text.match(/unit\s*#?\s*(\d{3})/i) || text.match(/\b(\d{3})\b/);
+  if(!m) return null;
+  return PORTFOLIO.tenants.find(t=>t.unit===m[1]) || null;
+}
+
+/* ---------------- entry point ---------------- */
+function send(){ const v=input.value.trim(); if(!v) return; input.value=''; handle(v); }
+
+async function handle(text){
+  if(busy) return;            // ignore input while a turn is still running
+  busy = true;
+  input.disabled = true;
+  quickBox.innerHTML='';
+  whoLabel(conv.tenant);
+  add(text,'me');
+  const t0 = Date.now(); conv.turnStart = t0;
+
+  // 1. Life safety overrides everything.
+  if(hits(text, LIFE_SAFETY.match)) return finish(await lifeSafety(text), t0);
+  // 2. Tenancy law never gets answered by the agent.
+  if(hits(text, LEGAL_GUARDRAIL.match)){
+    await say(LEGAL_GUARDRAIL.response, 1000);
+    logFeed('⚖','<b>Escalated to human</b> — tenancy-law question','gold','Agent declined to advise. Routed to contact@vgliving.ca');
+    return finish(null, t0);
+  }
+  // 3. Mid-flow states.
+  if(conv.stage==='needUnit')   return finish(await gotUnit(text), t0);
+  if(conv.stage==='deflecting') return finish(await gotDeflect(text), t0);
+  if(conv.stage==='needAccess') return finish(await gotAccess(text), t0);
+
+  // 4. Maintenance triage.
+  const rule = TRIAGE.find(r=>hits(text, r.match));
+  if(rule){
+    const t = extractUnit(text); if(t) conv.tenant = t;
+    return finish(await beginIssue(rule), t0);
+  }
+  // 5. General intents.
+  const gi = GENERAL_INTENTS.find(g=>hits(text, g.match));
+  if(gi){
+    await say(gi.reply, 850);
+    if(gi.lane==='owner') logFeed('★','<b>Owner lead captured</b>','gold','Lane: property owner — routed to contact@vgliving.ca');
+    if(gi.lane==='lease') logFeed('🔑','<b>Leasing enquiry</b>','gold','33 Erie Ave #709 — routed to rent@vgliving.ca');
+    return finish(null, t0);
+  }
+  // 6. Nothing matched.
+  await say(USE_LLM ? '…' : FALLBACK, 900);
+  return finish(null, t0);
+}
+
+function finish(){
+  conv.turnStart = null;
+  busy = false;
+  input.disabled = false;
+  renderStats();
+  if(scenarioRunning && scenarioQueue.length){
+    setTimeout(nextScenarioStep, 1500);
+  } else if(scenarioRunning){
+    scenarioRunning = false; setButtons(false);
+  }
+}
+
+/* ---------------- life safety ---------------- */
+async function lifeSafety(text){
+  await say(LIFE_SAFETY.response, 600, 'alert');
+  const t = conv.tenant || extractUnit(text);
+  const o = createWO({
+    label:'LIFE SAFETY — immediate response', priority:'P1', trade:'life-safety',
+    tenant:t, buildingWide:false
+  });
+  move(o,'triaged');
+  logFeed('🚨','<b>LIFE SAFETY escalation</b>','warn',
+    'On-call manager paged + tenant directed to 911. No triage tree, no queue.');
+  conv.stage='idle';
+}
+
+/* ---------------- issue flow ---------------- */
+async function beginIssue(rule){
+  conv.rule = rule;
+  if(!conv.tenant){
+    conv.stage='needUnit';
+    await say("Got it — I'll take care of this. What's your <b>unit number</b>?", 800);
+    return;
+  }
+  return continueIssue();
+}
+async function gotUnit(text){
+  const t = extractUnit(text);
+  if(!t){
+    await say("I couldn't match that to a unit. Try just the three digits — for example <b>204</b>.", 800);
+    return;
+  }
+  conv.tenant = t; conv.stage='idle';
+  whoLabel(t);
+  await say(`Thanks ${t.name.split(' ')[0]} — I've got you at <b>Unit ${t.unit}, ${findBuilding(t.building).name}</b>.`, 700);
+  return continueIssue();
+}
+
+async function continueIssue(){
+  const rule = conv.rule, t = conv.tenant;
+
+  // Emergency first aid goes out before anything administrative.
+  if(rule.firstAid) await say('⚠️ <b>First, right now:</b> ' + rule.firstAid, 800, 'alert');
+
+  // Dedup check — is this already a known building fault?
+  const dup = rule.buildingWide && state.orders.find(o =>
+    o.building===t.building && o.ruleId===rule.id && o.col!=='resolved');
+  if(dup){
+    dup.reports++; renderBoard();
+    await say(`We already know about this one — <b>WO-${dup.id}</b> is open for the whole building and ` +
+              `${dup.vendor ? '<b>'+dup.vendor+'</b> is assigned' : "a contractor is being assigned"}. ` +
+              `You're the <b>${dup.reports}${dup.reports===2?'nd':dup.reports===3?'rd':'th'}</b> unit to report it, ` +
+              `so I've added you to the notification list rather than opening a duplicate ticket.`, 1000);
+    logFeed('🔗',`<b>Merged into WO-${dup.id}</b> — Unit ${t.unit}`,'gold',
+      `${dup.reports} units reporting · dedup window ${DEDUP.windowMin} min · duplicate work orders suppressed`);
+    if(dup.reports===DEDUP.minReports && DEDUP.broadcast) await broadcast(dup);
+    conv.stage='idle'; conv.rule=null;
+    return;
+  }
+
+  // Try the free fix before spending the owner's money.
+  if(rule.deflect){
+    conv.deflect = DEFLECTIONS[rule.deflect];
+    conv.stage = 'deflecting';
+    await say(conv.deflect.ask, 950);
+    setQuick(['Yes, that fixed it ✅','No, still broken']);
+    return;
+  }
+  return toDispatch();
+}
+
+async function gotDeflect(text){
+  const yes = /\b(yes|yeah|yep|fixed|worked|it works|that did it|all good|sorted)\b/i.test(text);
+  const d = conv.deflect;
+  conv.stage='idle';
+  if(yes){
+    state.avoided++; state.saved += d.savedFee;
+    bump('stAvoid'); bump('stSaved');
+    const o = createWO({ label: conv.rule.label + ' — self-resolved', priority:'P3',
+                         trade:conv.rule.trade, tenant:conv.tenant, buildingWide:false });
+    o.cost = 0; move(o,'resolved');
+    await say(`That's it sorted. 🎉 No contractor needed, nothing to pay, and I've logged it as ` +
+              `<b>WO-${o.id} — resolved</b> so there's a record on your unit.<br><br>` +
+              `If it comes back, message me and I'll send someone out.`, 950);
+    logFeed('✓',`<b>Resolved without dispatch</b> — ${d.title}`,'ok',
+      `Unit ${conv.tenant.unit} · $${d.savedFee} call-out avoided · closed in under 2 minutes`);
+    conv.rule=null; return;
+  }
+  await say("No problem — that rules out the easy fix, so let's get a professional out.", 750);
+  return toDispatch();
+}
+
+async function toDispatch(){
+  const rule = conv.rule;
+  // Building-system faults need no unit entry, so skip the access question.
+  if(rule.priority==='P1' || rule.buildingWide) return openAndDispatch();
+  conv.stage='needAccess';
+  const pets = conv.tenant.pets !== 'None' ? ` I have a <b>${conv.tenant.pets.toLowerCase()}</b> on file for your unit — still right?` : '';
+  await say(`Two things and I'll get this booked.<br><br>` +
+            `Can the contractor <b>enter if you're not home</b>?${pets}<br><br>` +
+            `<small>Ontario requires 24 hours' written notice for non-emergency entry — if you say yes, ` +
+            `I'll generate and send that notice automatically.</small>`, 950);
+  setQuick(['Yes, they can enter','No — I need to be home']);
+}
+async function gotAccess(text){
+  const yes = /\b(yes|yeah|yep|sure|ok|okay|fine|go ahead|they can)\b/i.test(text);
+  conv.stage='idle';
+  conv.access = yes;
+  await say(yes
+    ? "Noted — entry permitted, and I'll issue the 24-hour written notice with the appointment."
+    : "Understood — I'll only book a window you've confirmed you're home for.", 750);
+  return openAndDispatch();
+}
+
+/* ---------------- work orders ---------------- */
+function createWO({label, priority, trade, tenant, buildingWide, ruleId}){
+  const o = {
+    id: ++state.woSeq, label, priority, trade,
+    unit: tenant ? tenant.unit : '—',
+    building: tenant ? tenant.building : 'LT',
+    buildingWide: !!buildingWide, ruleId: ruleId||null,
+    reports:1, col:'intake', vendor:null, sla:null, cost:null, approval:null
+  };
+  state.orders.push(o); renderBoard();
+  return o;
+}
+
+async function openAndDispatch(){
+  const rule = conv.rule, t = conv.tenant;
+  const p = PRIORITIES[rule.priority];
+  const o = createWO({ label:rule.label, priority:rule.priority, trade:rule.trade,
+                       tenant:t, buildingWide:rule.buildingWide, ruleId:rule.id });
+  o.sla = p.slaOnSite;
+
+  await say(`Opening <b>WO-${o.id}</b> — ${rule.label}, priority <b>${p.label}</b>. ` +
+            `Our commitment on this is <b>${p.slaOnSite}</b>. Finding you a contractor now.`, 900);
+  await wait(400); move(o,'triaged');
+  logFeed('📋',`<b>WO-${o.id} opened</b> — ${rule.label}`, 'gold',
+    `${o.buildingWide ? findBuilding(o.building).name+' · building system' : 'Unit '+o.unit} · ${p.label} · SLA ${p.slaOnSite}`);
+
+  conv.rule = null; conv.stage='idle';
+  await dispatch(o, rule);
+}
+
+async function dispatch(o, rule){
+  const p = PRIORITIES[o.priority];
+  const list = vendorsForTrade(o.trade, state.night);
+  if(!list.length){
+    logFeed('⚠','<b>No vendor available for trade</b> — escalated to VG on-call','warn', o.trade);
+    return;
+  }
+  move(o,'dispatched');
+
+  for(let i=0;i<list.length;i++){
+    const v = list[i];
+    o.vendor = v.name + ' — awaiting accept'; renderBoard();
+    logFeed('📤',`<b>Job sent to ${v.name}</b>`, '',
+      `WO-${o.id} · SMS to vendor · auto-escalates in ${p.realMin} min if no accept`);
+    await wait((v.acceptSec ?? p.escalateSec) * 1000);
+
+    if(v.acceptSec !== null && v.acceptSec !== undefined){
+      o.vendor = v.name;
+      o.cost = v.callOut + (o.priority==='P1'?420:o.priority==='P2'?180:60) + (o.buildingWide?600:0);
+      renderBoard();
+      logFeed('✅',`<b>${v.name} accepted</b>`, 'ok',
+        `WO-${o.id} · est. $${o.cost.toLocaleString()} · rating ${v.rating}`);
+      move(o,'scheduled');
+      await notifyTenant(o, v);
+      if(o.cost > PORTFOLIO.company.approvalThreshold) await requestApproval(o, v);
+      return;
+    }
+    // Timed out — this is the automation worth pitching.
+    logFeed('⏱',`<b>No response from ${v.name}</b> — escalating`, 'warn',
+      `${p.realMin} min elapsed · rolling to next vendor automatically, no human involved`);
+  }
+  o.vendor='Escalated to VG on-call'; renderBoard();
+  logFeed('⚠','<b>All vendors exhausted</b> — paged VG on-call manager','warn',`WO-${o.id}`);
+}
+
+async function notifyTenant(o, v){
+  const when = o.priority==='P1' ? 'within the next 90 minutes'
+             : o.priority==='P2' ? 'tomorrow between 9am and 1pm'
+             : 'Thursday between 1pm and 4pm';
+  await say(`Booked. ✅ <b>${v.name}</b> is assigned to <b>WO-${o.id}</b> and will be there <b>${when}</b>.<br><br>` +
+            `I'll text you when they're on the way. If anything changes before then, message me.`, 900);
+  logFeed('💬',`<b>Tenant notified</b> — Unit ${o.unit}`,'',
+    `Vendor, window and WO number sent. Cuts the "any update?" calls.`);
+}
+
+async function broadcast(o){
+  const b = findBuilding(o.building);
+  await wait(600);
+  logFeed('📢',`<b>Building broadcast — ${b.name}</b>`,'gold',
+    `All ${b.units} units notified of ${o.label.toLowerCase()} + ETA. Inbound duplicate reports stop here.`);
+  sys(`📢 Broadcast sent to all ${b.units} units at ${b.name}`);
+}
+
+async function requestApproval(o, v){
+  const b = findBuilding(o.building);
+  await wait(500);
+  const box = document.createElement('div');
+  box.className='approve';
+  box.innerHTML = `
+    <div class="h">⚑ Owner approval required</div>
+    <div class="d"><b>${b.owner.name}</b> · ${b.name}<br>
+      WO-${o.id} — ${o.label}<br>
+      ${v.name} · estimate <b>$${o.cost.toLocaleString()}</b><br>
+      <span style="color:var(--muted)">Over the $${PORTFOLIO.company.approvalThreshold} threshold — work is held until answered.</span></div>
+    <div class="btns">
+      <button class="yes">Approve</button>
+      <button class="no">Decline</button>
+    </div>`;
+  feed.appendChild(box); feed.scrollTop = feed.scrollHeight;
+  o.approval = 'awaiting owner'; renderBoard();
+
+  box.querySelector('.yes').onclick = async ()=>{
+    box.classList.add('done'); box.querySelector('.btns').innerHTML =
+      '<span style="color:var(--green);font-weight:700;font-size:12px">✓ Approved by owner</span>';
+    o.approval = 'owner approved'; move(o,'scheduled');
+    logFeed('✓','<b>Owner approved</b> — work released','ok',`WO-${o.id} · $${o.cost.toLocaleString()} · audit trail recorded`);
+    await say(`The owner has approved the repair, so <b>${v.name}</b> is confirmed and on the way. ` +
+              `You'll get a text when they're close.`, 850);
+  };
+  box.querySelector('.no').onclick = ()=>{
+    box.classList.add('done'); box.querySelector('.btns').innerHTML =
+      '<span style="color:var(--red);font-weight:700;font-size:12px">✕ Declined — routed to VG manager</span>';
+    o.approval = 'declined — manager review'; renderBoard();
+    logFeed('✕','<b>Owner declined</b> — escalated to VG manager','warn',`WO-${o.id} · agent does not proceed`);
+  };
+}
+
+/* ---------------- channels ---------------- */
+let activeChannel = 'sms';
+function renderChannels(){
+  const el = document.getElementById('chGrid'); el.innerHTML='';
+  CHANNELS.forEach(c=>{
+    const d = document.createElement('div');
+    d.className = 'ch ' + c.status + (c.id===activeChannel ? ' on' : '');
+    d.innerHTML = `<span class="badge ${c.status}">${c.status==='live'?'LIVE':'PHASE 2'}</span>
+      <div class="top"><span>${c.icon}</span><span class="nm">${c.name}</span></div>
+      <div class="pf">${c.platform}</div>
+      <div class="nt">${c.note}</div>`;
+    if(c.status==='live'){
+      d.onclick = ()=>{
+        activeChannel = c.id;
+        document.getElementById('chanTag').textContent = c.tag;
+        renderChannels();
+        logFeed('🔀', `<b>Inbound channel — ${c.name}</b>`, 'gold', c.platform + ' · same agent, same rules');
+      };
+    }
+    el.appendChild(d);
+  });
+}
+
+/* ---------------- preventive maintenance ---------------- */
+function renderPM(){
+  const el = document.getElementById('pmFeed'); el.innerHTML='';
+  PORTFOLIO.pmCalendar.forEach(p=>{
+    const v = PORTFOLIO.vendors.find(x=>x.id===p.vendor);
+    const b = findBuilding(p.building);
+    const d = document.createElement('div'); d.className='pm';
+    d.innerHTML = `<div><div class="n">${p.task}</div>
+      <div class="b">${b.name} · due ${p.due} · ${v.name}</div></div>
+      <div class="st ${p.status}">${p.status}</div>`;
+    el.appendChild(d);
+  });
+}
+
+/* ---------------- scenarios ---------------- */
+const SCENARIOS = {
+  A: { night:false, steps:[
+    { as:{unit:'507'}, text:"Half the outlets in my unit stopped working — the kitchen and bathroom are dead" },
+    { text:"Yes, that fixed it ✅" }
+  ]},
+  B: { night:false, steps:[
+    { as:{unit:'204'}, text:"Unit 204 — there's no hot water, been cold since this morning" },
+    { as:{unit:'311'}, text:"Hi, no hot water in 311" },
+    { as:{unit:'108'}, text:"108 here — we've got no hot water either" }
+  ]},
+  C: { night:true, steps:[
+    { as:{unit:'204'}, text:"Water is pouring out from under my kitchen sink, it's flooding the floor" }
+  ]}
+};
+
+function setButtons(disabled){
+  ['s1','s2','s3'].forEach(id=>document.getElementById(id).disabled = disabled);
+}
+function runScenario(key){
+  resetAll();
+  const s = SCENARIOS[key];
+  if(s.night !== state.night) toggleClock();
+  scenarioQueue = s.steps.slice();
+  scenarioRunning = true; setButtons(true);
+  setTimeout(nextScenarioStep, 700);
+}
+function nextScenarioStep(){
+  const step = scenarioQueue.shift();
+  if(!step){ scenarioRunning=false; setButtons(false); return; }
+  if(step.as){
+    const t = findTenant(step.as.unit, step.as.building);
+    if(t){ conv.tenant = t; conv.stage='idle'; conv.rule=null; }
+  }
+  handle(step.text);
+}
+
+/* ---------------- boot ---------------- */
+function resetAll(){
+  gen++; busy = false; input.disabled = false;
+  scenarioQueue=[]; scenarioRunning=false; setButtons(false);
+  initState();
+  thread.innerHTML=''; quickBox.innerHTML='';
+  feed.innerHTML='<div class="empty">Nothing dispatched yet. Run a scenario, or type as a tenant on the left.</div>';
+  renderBoard(); renderPM(); renderChannels();
+  say(PERSONA.greeting, 400).then(()=>{
+    setQuick(['No hot water','Half my outlets are dead','I smell gas','Can you manage my property?']);
+  });
+}
+initState();
+resetAll();
+</script>
+</body>
+</html>
