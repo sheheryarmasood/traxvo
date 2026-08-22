@@ -371,7 +371,7 @@
           <div class="ok" id="okFallback">
             <b>One last step, <span id="fbName">friend</span>.</b><br>
             Tap below to send your details — it opens your email app with everything already filled in.
-            <a class="btn btn-primary" id="fbLink" href="mailto:hello@traxvo.com" style="margin-top:18px;width:100%;justify-content:center">Send my request <span class="arw">&#8594;</span></a>
+            <a class="btn btn-primary" id="fbLink" href="mailto:info@traxvo.com" style="margin-top:18px;width:100%;justify-content:center">Send my request <span class="arw">&#8594;</span></a>
           </div>
         </div>
       </div>
@@ -386,7 +386,7 @@
       <div class="foot-word">TRAXVO<span class="asq" style="width:18px;height:18px"></span></div>
       <div class="foot-right">
         <div class="foot-tag">Marketing Intelligence, Engineered.</div>
-        <a href="mailto:hello@traxvo.com" class="foot-mail">hello@traxvo.com</a>
+        <a href="mailto:info@traxvo.com" class="foot-mail">info@traxvo.com</a>
       </div>
     </div>
     <div class="foot-meta">
@@ -570,7 +570,7 @@ document.getElementById('bookForm').addEventListener('submit',async function(ev)
   const handoff=()=>{
     const NL=String.fromCharCode(10);
     const body=['Name: '+name,'Business: '+biz,'Contact: '+contact].join(NL)+(msg?NL+NL+'About the business:'+NL+msg:'');
-    g('fbLink').href='mailto:hello@traxvo.com?subject='+encodeURIComponent('Free audit request — '+biz)+'&body='+encodeURIComponent(body);
+    g('fbLink').href='mailto:info@traxvo.com?subject='+encodeURIComponent('Free audit request — '+biz)+'&body='+encodeURIComponent(body);
     g('fbName').textContent=first;
     hideForm();g('okFallback').style.display='block';
   };
