@@ -12,9 +12,9 @@ const PORTFOLIO = {
     legal: 'VoraG Living Inc.',
     phone: '+1 (XXX) XXX-XXXX',
     phoneDial: '+1XXXXXXXXXX',
-    careEmail: 'care@vgliving.ca',
-    rentEmail: 'rent@vgliving.ca',
-    ownerEmail: 'contact@vgliving.ca',
+    careEmail: 'care@example.com',
+    rentEmail: 'rent@example.com',
+    ownerEmail: 'contact@example.com',
     // Threshold above which a repair cannot proceed without owner sign-off.
     // Confirm the real number with Asad — this is a placeholder.
     approvalThreshold: 500

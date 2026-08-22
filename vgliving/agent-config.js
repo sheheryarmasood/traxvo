@@ -57,7 +57,7 @@ const LEGAL_GUARDRAIL = {
     "That's a tenancy-law question, and I'm not the right one to answer it — " +
     "getting it wrong could cost you or the owner real money, so I won't guess.<br><br>" +
     "I've flagged this for VG Living's management team and they'll follow up directly. " +
-    "You can also reach them at <b>contact@vgliving.ca</b> or <b>+1 (XXX) XXX-XXXX</b>.<br><br>" +
+    "You can also reach them at <b>contact@example.com</b> or <b>+1 (XXX) XXX-XXXX</b>.<br><br>" +
     "Anything on the maintenance side I <i>can</i> take care of right now?"
 };
 
@@ -205,8 +205,8 @@ const DEDUP = {
 const GENERAL_INTENTS = [
   { id:'rentpay', match:['pay rent','rent payment','pay my rent','e-transfer','pre-authorized','when is rent due','late on rent'],
     reply:"Rent is handled through the VG Living resident portal — you can pay and see your ledger there. " +
-          "If you're having trouble logging in, email <b>care@vgliving.ca</b> and the team will sort it out.<br><br>" +
-          "If this is about being short this month, tell the management team early rather than late — reach them at <b>contact@vgliving.ca</b>. I'll leave that with a human." },
+          "If you're having trouble logging in, email <b>care@example.com</b> and the team will sort it out.<br><br>" +
+          "If this is about being short this month, tell the management team early rather than late — reach them at <b>contact@example.com</b>. I'll leave that with a human." },
   { id:'hours',   match:['hours','open','what time','after hours','weekend'],
     reply:"For maintenance, I'm here <b>24/7</b> — that's the point of me. Emergencies get dispatched immediately, any hour.<br><br>" +
           "Routine requests logged overnight get picked up first thing. The office line is <b>+1 (XXX) XXX-XXXX</b> (select <b>Care</b>)." },
@@ -244,7 +244,7 @@ const CHANNELS = [
     note:'The existing "Select Care" option answers as Vera after hours. Hands to a human on request.' },
   { id:'email', icon:'✉️', name:'Email', tag:'EMAIL · care@', status:'live',
     platform:'SendGrid — send + Inbound Parse',
-    note:'Sends as care@vgliving.ca. Tenant replies webhook straight back into the same thread.' },
+    note:'Sends as care@example.com. Tenant replies webhook straight back into the same thread.' },
   { id:'wa', icon:'🟩', name:'WhatsApp', tag:'WHATSAPP', status:'planned',
     platform:'Twilio WhatsApp Business API',
     note:'Adds Meta template approval and a 24-hour session window. Worth it only if tenants ask.' },

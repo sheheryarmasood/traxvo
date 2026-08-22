@@ -303,7 +303,7 @@
   <b>Demo build.</b> Buildings, units, tenants and vendors are simulated stand-ins — in production the rent roll and
   work orders come from Buildium, and vendor dispatch runs over SMS. Escalation timers are compressed for the demo
   (the card shows the real interval). Preventive-maintenance intervals shown are per service contract, not asserted
-  statutory minimums. Company details, phone, <b>care@vgliving.ca</b> and the Brantford listing are real, from vgliving.ca.
+  statutory minimums. Phone numbers and email addresses are masked in this public build.
 </div>
 
 <script src="ops-data.js"></script>
@@ -478,7 +478,7 @@ async function handle(text){
   // 2. Tenancy law never gets answered by the agent.
   if(hits(text, LEGAL_GUARDRAIL.match)){
     await say(LEGAL_GUARDRAIL.response, 1000);
-    logFeed('⚖','<b>Escalated to human</b> — tenancy-law question','gold','Agent declined to advise. Routed to contact@vgliving.ca');
+    logFeed('⚖','<b>Escalated to human</b> — tenancy-law question','gold','Agent declined to advise. Routed to contact@example.com');
     return finish(null, t0);
   }
   // 3. Mid-flow states.
@@ -496,8 +496,8 @@ async function handle(text){
   const gi = GENERAL_INTENTS.find(g=>hits(text, g.match));
   if(gi){
     await say(gi.reply, 850);
-    if(gi.lane==='owner') logFeed('★','<b>Owner lead captured</b>','gold','Lane: property owner — routed to contact@vgliving.ca');
-    if(gi.lane==='lease') logFeed('🔑','<b>Leasing enquiry</b>','gold','33 Erie Ave #709 — routed to rent@vgliving.ca');
+    if(gi.lane==='owner') logFeed('★','<b>Owner lead captured</b>','gold','Lane: property owner — routed to contact@example.com');
+    if(gi.lane==='lease') logFeed('🔑','<b>Leasing enquiry</b>','gold','33 Erie Ave #709 — routed to rent@example.com');
     return finish(null, t0);
   }
   // 6. Nothing matched.
